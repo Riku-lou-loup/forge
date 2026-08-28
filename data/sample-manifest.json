@@ -1,0 +1,21 @@
+{
+  "dataset": "SKAB",
+  "authors": [
+    "Iurii D. Katser",
+    "Vyacheslav O. Kozitsin"
+  ],
+  "repository": "https://github.com/waico/SKAB",
+  "revision": "b2c0d46c2971dcbfe71e26087b6d231998bb91c2",
+  "experiment_id": "valve1/1",
+  "source_url": "https://raw.githubusercontent.com/waico/SKAB/b2c0d46c2971dcbfe71e26087b6d231998bb91c2/data/valve1/1.csv",
+  "documentation_url": "https://github.com/waico/SKAB/blob/b2c0d46c2971dcbfe71e26087b6d231998bb91c2/data/README.md",
+  "repository_license": "GPL-3.0",
+  "license_url": "https://github.com/waico/SKAB/blob/b2c0d46c2971dcbfe71e26087b6d231998bb91c2/LICENSE",
+  "local_path": "data/raw/skab/valve1_1.csv",
+  "sha256": "fe4493bf805baef4e6dfb864094275d8cc2ea80a16b3735e2752b18b6aefd812",
+  "bytes": 110330,
+  "retrieved_at_utc": "2026-09-29T14:48:52.910387+00:00",
+  "role": "development_only; inspected with source labels; exclude from final test set",
+  "timestamp_timezone": "unspecified in source; preserve recorded times",
+  "experiment_description": "Controlled closing of the valve at the pump flow inlet, per source catalog."
+}
