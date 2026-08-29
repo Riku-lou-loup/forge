@@ -7,6 +7,9 @@ name = "forge-maintenance"
 version = "0.1.0"
 description = "Equipment anomaly investigation using sensor measurements and technical documents."
 readme = "README.md"
+authors = [{ name = "Dang Duong Dang Khoa" }]
+license = "PolyForm-Noncommercial-1.0.0"
+license-files = ["LICENSE", "NOTICE", "COMMERCIAL-LICENSING.md"]
 requires-python = ">=3.13,<3.14"
 dependencies = [
     "numpy>=2,<3",

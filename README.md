@@ -99,6 +99,24 @@ factory reliability, exact fault diagnosis, remaining useful life, or saved down
 Anomaly and change-point labels are evaluation annotations and are excluded from
 model inputs. Source attribution remains part of the public repository.
 
+## License and commercial use
+
+Copyright (c) 2026 **Dang Duong Dang Khoa**.
+
+FORGE's original code and documentation are licensed under
+[PolyForm Noncommercial 1.0.0](LICENSE). Noncommercial use is allowed under its
+terms, including its stated permitted-purpose provisions. Redistribution must
+preserve the required attribution in [NOTICE](NOTICE) and provide the license
+text or its URL.
+
+**Commercial use outside the license's permitted purposes requires prior written
+permission from Dang Duong Dang Khoa.** Commercial agreements must include author
+credit; contact alone does not grant permission. See
+[commercial licensing](COMMERCIAL-LICENSING.md) for the request process.
+
+This is source-available software with restrictions on commercial use. Third-party
+dependencies, SKAB data, and external documents retain their own licenses.
+
 ## Local configuration
 
 `.env.example` documents future model settings with calls disabled and no key.
