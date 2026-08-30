@@ -1,16 +1,3 @@
 FORGE
 
-Required Notice: Copyright (c) 2026 Dang Duong Dang Khoa. FORGE.
-
-The original FORGE code and documentation are offered under the
-PolyForm Noncommercial License 1.0.0 in LICENSE. Preserve the Required Notice
-above and provide the license text or its URL when distributing covered software,
-as required by that license.
-
-Commercial use outside the permitted purposes in LICENSE requires a separate
-written agreement with Dang Duong Dang Khoa. See COMMERCIAL-LICENSING.md.
-
-Third-party software, datasets, and documents retain their respective licenses
-and copyright notices. This license does not relicense those materials.
-SKAB attribution and source-license information are recorded in data/README.md
-and data/sample-manifest.json. Raw SKAB recordings are downloaded separately.
+Copyright (c) 2026 Dang Duong Dang Khoa.

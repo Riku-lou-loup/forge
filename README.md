@@ -104,18 +104,15 @@ model inputs. Source attribution remains part of the public repository.
 Copyright (c) 2026 **Dang Duong Dang Khoa**.
 
 FORGE's original code and documentation are licensed under
-[PolyForm Noncommercial 1.0.0](LICENSE). Noncommercial use is allowed under its
-terms, including its stated permitted-purpose provisions. Redistribution must
-preserve the required attribution in [NOTICE](NOTICE) and provide the license
-text or its URL.
+[Apache License 2.0](LICENSE). Commercial and noncommercial use are allowed
+without asking for permission or paying a royalty, subject to the license terms.
 
-**Commercial use outside the license's permitted purposes requires prior written
-permission from Dang Duong Dang Khoa.** Commercial agreements must include author
-credit; contact alone does not grant permission. See
-[commercial licensing](COMMERCIAL-LICENSING.md) for the request process.
+Redistributions must include the license and preserve applicable copyright and
+attribution notices, including the relevant author credit from [NOTICE](NOTICE),
+as required by section 4. See [attribution guidance](ATTRIBUTION.md) for details,
+including the distinction between redistribution and hosted-only use.
 
-This is source-available software with restrictions on commercial use. Third-party
-dependencies, SKAB data, and external documents retain their own licenses.
+Third-party dependencies, SKAB data, and external documents retain their own licenses.
 
 ## Local configuration
 
