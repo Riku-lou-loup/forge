@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "split_id": "skab-experiment-v1",
+  "dataset_revision": "b2c0d46c2971dcbfe71e26087b6d231998bb91c2",
+  "status": "fixed_before_baseline_training",
+  "inventory_file": "skab-inventory.json",
+  "allocation": "Explicit whole-experiment allocation; chronological valve blocks; overlap-connected recordings kept together. No model results used.",
+  "development_only": [
+    "valve1/1"
+  ],
+  "partitions": {
+    "train": [
+      "anomaly-free/anomaly-free",
+      "valve1/0",
+      "valve1/1",
+      "valve1/2",
+      "valve1/3",
+      "valve1/4",
+      "valve1/5",
+      "valve1/6",
+      "valve1/7",
+      "valve2/0",
+      "other/5",
+      "other/6",
+      "other/9",
+      "other/14"
+    ],
+    "validation": [
+      "valve1/8",
+      "valve1/9",
+      "valve1/10",
+      "valve1/11",
+      "valve2/1",
+      "other/1",
+      "other/7",
+      "other/10",
+      "other/11"
+    ],
+    "test": [
+      "valve1/12",
+      "valve1/13",
+      "valve1/14",
+      "valve1/15",
+      "valve2/2",
+      "valve2/3",
+      "other/2",
+      "other/3",
+      "other/4",
+      "other/8",
+      "other/12",
+      "other/13"
+    ]
+  },
+  "fitting_policy": "Use normal-labeled rows from train plus the source-designated anomaly-free train recording; deduplicate timestamp and all eight sensors before fitting. Do not synthesize source annotations for the unlabeled file.",
+  "feature_policy": "Only the eight sensor columns and causal derived features. Exclude annotation columns, recording IDs, and absolute timestamps. Reset window state between recordings.",
+  "selection_policy": "Fit preprocessing and models on train only. Choose features, thresholds, hyperparameters, and alert aggregation on validation. Freeze all decisions before accessing test for evaluation.",
+  "test_policy": "Metadata and overlap checks performed during inventory; no outcome exploration or modeling. Test use requires explicit opt-in. Do not tune or refit using test.",
+  "limitations": "Single testbed; some train/validation/test recordings share a date and operating session. Not an unseen-machine, unseen-day, or official SKAB leaderboard split."
+}

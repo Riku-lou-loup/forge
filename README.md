@@ -2,13 +2,14 @@
 
 Equipment anomaly investigation using sensor measurements and technical documents.
 
-FORGE is being built to connect time-series anomaly detection, document retrieval,
-and a reviewed maintenance report. The current application explores real pump
-measurements from the Skoltech Anomaly Benchmark (SKAB).
+FORGE is being developed to investigate equipment anomalies through time-series
+analysis and document retrieval, with findings collected in a maintenance report
+for review. The current application explores real pump measurements from the
+Skoltech Anomaly Benchmark (SKAB).
 
-**Status: early development.** Data loading, validation, and interactive exploration
-are implemented. Anomaly detection, RAG, and agent orchestration are planned;
-there are no model-performance or operational-impact results yet.
+The project is in early development. Data loading, validation, and interactive
+exploration are implemented. Anomaly detection, RAG, and agent orchestration remain
+planned work, with model performance and operational impact still to be evaluated.
 
 ## What works today
 
@@ -16,15 +17,18 @@ there are no model-performance or operational-impact results yet.
 - Validate timestamps, sensor values, and annotation columns without filling gaps.
 - Explore eight sensor channels and their source-provided anomaly annotations.
 - Inspect the recording's data-quality audit, provenance, and sampling intervals.
+- Reproduce a pinned 35-file inventory and validate training, validation, and test
+  assignments that keep overlapping recordings together. See the
+  [data split protocol](docs/data-split.md).
 - Run loader tests and application smoke checks without a model API key.
 
-The sample contains 1,145 observations over 20 minutes. Chart highlights are dataset
-annotations, not detector predictions. This recording is reserved for development
-and will be excluded from the final test set.
+The sample contains 1,145 observations over 20 minutes. Chart highlights show the
+dataset's annotations, and detector predictions remain to be implemented. This
+recording is reserved for development and excluded from the final test set.
 
 ## Quick start
 
-The documented environment is **Windows with Python 3.13**. From your cloned
+The documented environment is Windows with Python 3.13. From your cloned
 repository folder, run these commands in PowerShell:
 
 ```powershell
@@ -39,17 +43,17 @@ Open [the local application](http://127.0.0.1:8511). Stop it with Ctrl+C.
 After setup, `start.cmd` also launches the app. Use `-m forge app --port 8512`
 if the default port is occupied. Always use the repository's `.venv` interpreter.
 
-The sample is downloaded from the upstream source; raw data is not bundled in Git.
+The sample is downloaded from the upstream source. Raw data stays outside Git.
 An API key, database server, and hardware are not required for the current app.
-The dependency snapshot records the development environment; other platforms
+The dependency snapshot records the development environment. Other platforms
 have not been validated.
 
 ## Stack
 
 Python, NumPy, pandas, Plotly, and Streamlit support the implemented data explorer.
 scikit-learn, pypdf, LangGraph, and langchain-openai are installed for planned
-modeling and retrieval work. Installing these libraries does not implement those
-features. pytest and Ruff cover software checks.
+modeling and retrieval work. Those features remain to be implemented. pytest and
+Ruff provide software checks.
 
 ## Repository layout
 
@@ -84,8 +88,8 @@ If PowerShell blocks scripts, run the checks directly:
 ```
 
 Tests use small synthetic fixtures to verify software behavior. The smoke check
-exercises dependencies and renders the Streamlit app. Neither is an ML benchmark.
-Checks make no model API requests.
+exercises dependencies and renders the Streamlit app. These checks make no model
+API requests. ML benchmarking remains separate work.
 
 ## Data provenance and limitations
 
