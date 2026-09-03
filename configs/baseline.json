@@ -1,0 +1,10 @@
+{
+  "protocol": "forge-baseline-v1",
+  "seed": 42,
+  "n_estimators": 256,
+  "max_samples": [256, 1024],
+  "threshold_quantiles": 101,
+  "persistence": 3,
+  "max_gap_seconds": 2,
+  "selection": "Highest validation point F1 after causal persistence; ties prefer fewer false alarm onsets, then higher threshold, then earlier candidate. No test feedback."
+}
