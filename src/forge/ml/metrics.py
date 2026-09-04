@@ -61,7 +61,7 @@ def evaluate_group(frame, scores, threshold, policy):
         hits = onsets[(onsets >= begin) & (onsets < end)]
         if len(hits):
             delays.append((times[hits[0]] - times[begin]).total_seconds())
-    intervals = np.r_[np.diff(times.asi8) / 1e9, 1.0]
+    intervals = np.r_[np.diff(times.as_unit("ns").asi8) / 1e9, 1.0]
     normal_hours = float(np.minimum(intervals, 1.0)[labels == 0].sum() / 3600)
     false_onsets = int((labels[onsets] == 0).sum())
     both_classes = len(np.unique(y)) == 2

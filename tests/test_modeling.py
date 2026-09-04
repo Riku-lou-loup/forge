@@ -85,6 +85,14 @@ def test_unknown_annotation_breaks_alerts_and_is_excluded():
     assert result["tp"] == 0
 
 
+def test_normal_exposure_does_not_depend_on_pandas_timestamp_resolution():
+    frame = readings(range(6), [0, 0, 0, 1, 1, 1])
+    frame["datetime"] = frame.datetime.dt.as_unit("us")
+    result = evaluate_group(frame, np.ones(6), 0.5, {"persistence": 3, "max_gap_seconds": 2})
+    assert result["normal_hours"] == pytest.approx(3 / 3600)
+    assert result["false_alarms_per_normal_hour"] == pytest.approx(1200)
+
+
 def test_validation_selection_can_reject_normal_scores():
     frame = readings(range(16), [0] * 12 + [1] * 4)
     groups = {"synthetic": frame}

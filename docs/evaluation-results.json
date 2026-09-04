@@ -1,0 +1,490 @@
+{
+  "run_id": "20261007T003523Z-e78e7b17",
+  "model_sha256": "5dc1aa6576af7cefc9fbf41e48c7c725e6b88be88a43bb66a98c05ce598a4d91",
+  "dataset_revision": "b2c0d46c2971dcbfe71e26087b6d231998bb91c2",
+  "split_id": "skab-experiment-v1",
+  "config_sha256": "91153a207140e4f6e173478b2eca597950c46627701bc994c740894f00673b17",
+  "config": {
+    "protocol": "forge-baseline-v1",
+    "seed": 42,
+    "n_estimators": 256,
+    "max_samples": [
+      256,
+      1024
+    ],
+    "threshold_quantiles": 101,
+    "persistence": 3,
+    "max_gap_seconds": 2,
+    "selection": "Highest validation point F1 after causal persistence; ties prefer fewer false alarm onsets, then higher threshold, then earlier candidate. No test feedback."
+  },
+  "training_audit": {
+    "raw_rows": 23893,
+    "excluded_anomalous_rows": 5015,
+    "duplicate_normal_rows": 572,
+    "training_rows": 18306,
+    "source_catalog_normal_rows": 9405
+  },
+  "validation_audit": {
+    "other/1": {
+      "raw_rows": 745,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 745
+    },
+    "other/10": {
+      "raw_rows": 2517,
+      "duplicate_rows": 21,
+      "ambiguous_rows": 0,
+      "unique_rows": 2496
+    },
+    "other/7": {
+      "raw_rows": 1090,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1090
+    },
+    "valve1/10": {
+      "raw_rows": 1146,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1146
+    },
+    "valve1/11": {
+      "raw_rows": 1141,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1141
+    },
+    "valve1/8": {
+      "raw_rows": 1144,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1144
+    },
+    "valve1/9": {
+      "raw_rows": 1148,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1148
+    },
+    "valve2/1": {
+      "raw_rows": 1063,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1063
+    }
+  },
+  "selected_detector": {
+    "name": "isolation_forest_1024",
+    "features": [
+      "Accelerometer1RMS",
+      "Accelerometer2RMS",
+      "Current",
+      "Pressure",
+      "Temperature",
+      "Thermocouple",
+      "Voltage",
+      "Volume Flow RateRMS"
+    ],
+    "center": [
+      0.210522,
+      0.26488849999999997,
+      2.050195,
+      0.054711,
+      88.67609999999999,
+      28.0019,
+      229.514,
+      124.333
+    ],
+    "scale": [
+      0.012009060000000035,
+      0.012573930600000024,
+      1.057323603,
+      0.24308895478131948,
+      2.1831285000000054,
+      1.9726734300000008,
+      9.074253299999988,
+      3.9540942000000023
+    ],
+    "scale_methods": [
+      "MAD",
+      "MAD",
+      "MAD",
+      "IQR",
+      "MAD",
+      "MAD",
+      "MAD",
+      "MAD"
+    ],
+    "score_direction": "larger means more unusual; not a failure probability"
+  },
+  "threshold": 0.5047205853276816,
+  "validation_candidates": [
+    {
+      "name": "robust_max",
+      "threshold": 23.351239330615833,
+      "pooled": {
+        "rows": 9973,
+        "positive_rows": 3507,
+        "tp": 1884,
+        "fp": 12,
+        "fn": 1623,
+        "tn": 6454,
+        "events": 10,
+        "detected_events": 7,
+        "false_alarm_onsets": 6,
+        "normal_hours": 1.7961111111111112,
+        "precision": 0.9936708860759493,
+        "recall": 0.5372112917023096,
+        "f1": 0.6973903387007219,
+        "event_recall": 0.7,
+        "false_alarms_per_normal_hour": 3.3405505722239406,
+        "average_precision": 0.7235202035611961,
+        "macro_group_average_precision": 0.8785462389943999,
+        "median_detected_event_delay_seconds": 29.0
+      }
+    },
+    {
+      "name": "isolation_forest_256",
+      "threshold": 0.5135474485253543,
+      "pooled": {
+        "rows": 9973,
+        "positive_rows": 3507,
+        "tp": 3017,
+        "fp": 2384,
+        "fn": 490,
+        "tn": 4082,
+        "events": 10,
+        "detected_events": 8,
+        "false_alarm_onsets": 264,
+        "normal_hours": 1.7961111111111112,
+        "precision": 0.5586002592112572,
+        "recall": 0.8602794411177644,
+        "f1": 0.6773686573866188,
+        "event_recall": 0.8,
+        "false_alarms_per_normal_hour": 146.98422517785338,
+        "average_precision": 0.49294117840420204,
+        "macro_group_average_precision": 0.6110565238176919,
+        "median_detected_event_delay_seconds": 5.0
+      }
+    },
+    {
+      "name": "isolation_forest_1024",
+      "threshold": 0.5047205853276816,
+      "pooled": {
+        "rows": 9973,
+        "positive_rows": 3507,
+        "tp": 3156,
+        "fp": 2193,
+        "fn": 351,
+        "tn": 4273,
+        "events": 10,
+        "detected_events": 8,
+        "false_alarm_onsets": 201,
+        "normal_hours": 1.7961111111111112,
+        "precision": 0.5900168255748738,
+        "recall": 0.8999144568006844,
+        "f1": 0.7127371273712737,
+        "event_recall": 0.8,
+        "false_alarms_per_normal_hour": 111.908444169502,
+        "average_precision": 0.5083200209962655,
+        "macro_group_average_precision": 0.6474628970444742,
+        "median_detected_event_delay_seconds": 5.0
+      }
+    }
+  ],
+  "test": {
+    "run_id": "20261007T003523Z-e78e7b17",
+    "model_sha256": "5dc1aa6576af7cefc9fbf41e48c7c725e6b88be88a43bb66a98c05ce598a4d91",
+    "evaluated_at": "2026-10-07T00:37:36.940236+00:00",
+    "split_id": "skab-experiment-v1",
+    "partition": "test",
+    "audit": {
+      "other/12": {
+        "raw_rows": 1971,
+        "duplicate_rows": 349,
+        "ambiguous_rows": 178,
+        "unique_rows": 1622
+      },
+      "other/2": {
+        "raw_rows": 3108,
+        "duplicate_rows": 348,
+        "ambiguous_rows": 57,
+        "unique_rows": 2760
+      },
+      "other/8": {
+        "raw_rows": 1147,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 1147
+      },
+      "valve1/12": {
+        "raw_rows": 1140,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 1140
+      },
+      "valve1/13": {
+        "raw_rows": 1140,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 1140
+      },
+      "valve1/14": {
+        "raw_rows": 1139,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 1139
+      },
+      "valve1/15": {
+        "raw_rows": 1150,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 1150
+      },
+      "valve2/2": {
+        "raw_rows": 1129,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 1129
+      },
+      "valve2/3": {
+        "raw_rows": 995,
+        "duplicate_rows": 0,
+        "ambiguous_rows": 0,
+        "unique_rows": 995
+      }
+    },
+    "metrics": {
+      "pooled": {
+        "rows": 11987,
+        "positive_rows": 4310,
+        "tp": 3594,
+        "fp": 3771,
+        "fn": 716,
+        "tn": 3906,
+        "events": 23,
+        "detected_events": 18,
+        "false_alarm_onsets": 310,
+        "normal_hours": 2.1325,
+        "precision": 0.4879837067209776,
+        "recall": 0.8338747099767981,
+        "f1": 0.6156745182012848,
+        "event_recall": 0.782608695652174,
+        "false_alarms_per_normal_hour": 145.36928487690506,
+        "average_precision": 0.45087674453286086,
+        "macro_group_average_precision": 0.6075996158158725,
+        "median_detected_event_delay_seconds": 2.0
+      },
+      "per_group": {
+        "other/12": {
+          "rows": 1444,
+          "positive_rows": 396,
+          "tp": 358,
+          "fp": 1025,
+          "fn": 38,
+          "tn": 23,
+          "precision": 0.2588575560375994,
+          "recall": 0.9040404040404041,
+          "f1": 0.4024732996065205,
+          "average_precision": 0.40769275044761744,
+          "roc_auc": 0.5462159765594881,
+          "events": 13,
+          "detected_events": 11,
+          "event_recall": 0.8461538461538461,
+          "detected_event_delays_seconds": [
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            3.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0
+          ],
+          "false_alarm_onsets": 8,
+          "normal_hours": 0.2911111111111111,
+          "false_alarms_per_normal_hour": 27.480916030534353
+        },
+        "other/2": {
+          "rows": 2703,
+          "positive_rows": 1120,
+          "tp": 1118,
+          "fp": 1579,
+          "fn": 2,
+          "tn": 4,
+          "precision": 0.41453466814979606,
+          "recall": 0.9982142857142857,
+          "f1": 0.5858003667801939,
+          "average_precision": 0.4042440971948529,
+          "roc_auc": 0.49367498420720146,
+          "events": 3,
+          "detected_events": 1,
+          "event_recall": 0.3333333333333333,
+          "detected_event_delays_seconds": [
+            2.0
+          ],
+          "false_alarm_onsets": 2,
+          "normal_hours": 0.43972222222222224,
+          "false_alarms_per_normal_hour": 4.548325963360707
+        },
+        "other/8": {
+          "rows": 1147,
+          "positive_rows": 403,
+          "tp": 3,
+          "fp": 21,
+          "fn": 400,
+          "tn": 723,
+          "precision": 0.125,
+          "recall": 0.007444168734491315,
+          "f1": 0.01405152224824356,
+          "average_precision": 0.3280280304239509,
+          "roc_auc": 0.4549014114570826,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            54.0
+          ],
+          "false_alarm_onsets": 9,
+          "normal_hours": 0.20666666666666667,
+          "false_alarms_per_normal_hour": 43.54838709677419
+        },
+        "valve1/12": {
+          "rows": 1140,
+          "positive_rows": 399,
+          "tp": 399,
+          "fp": 47,
+          "fn": 0,
+          "tn": 694,
+          "precision": 0.8946188340807175,
+          "recall": 1.0,
+          "f1": 0.9443786982248521,
+          "average_precision": 0.880487939056556,
+          "roc_auc": 0.9495229301323483,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "detected_event_delays_seconds": [],
+          "false_alarm_onsets": 23,
+          "normal_hours": 0.20583333333333334,
+          "false_alarms_per_normal_hour": 111.7408906882591
+        },
+        "valve1/13": {
+          "rows": 1140,
+          "positive_rows": 399,
+          "tp": 336,
+          "fp": 279,
+          "fn": 63,
+          "tn": 462,
+          "precision": 0.5463414634146342,
+          "recall": 0.8421052631578947,
+          "f1": 0.6627218934911243,
+          "average_precision": 0.6487182055323468,
+          "roc_auc": 0.7731981776303107,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            1.0
+          ],
+          "false_alarm_onsets": 64,
+          "normal_hours": 0.20583333333333334,
+          "false_alarms_per_normal_hour": 310.9311740890688
+        },
+        "valve1/14": {
+          "rows": 1139,
+          "positive_rows": 399,
+          "tp": 350,
+          "fp": 176,
+          "fn": 49,
+          "tn": 564,
+          "precision": 0.6653992395437263,
+          "recall": 0.8771929824561403,
+          "f1": 0.7567567567567568,
+          "average_precision": 0.6713995993069277,
+          "roc_auc": 0.8212253606990448,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            12.0
+          ],
+          "false_alarm_onsets": 51,
+          "normal_hours": 0.20555555555555555,
+          "false_alarms_per_normal_hour": 248.10810810810813
+        },
+        "valve1/15": {
+          "rows": 1150,
+          "positive_rows": 404,
+          "tp": 344,
+          "fp": 164,
+          "fn": 60,
+          "tn": 582,
+          "precision": 0.6771653543307087,
+          "recall": 0.8514851485148515,
+          "f1": 0.7543859649122807,
+          "average_precision": 0.8001674611953106,
+          "roc_auc": 0.8607988479813129,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            2.0
+          ],
+          "false_alarm_onsets": 52,
+          "normal_hours": 0.20722222222222222,
+          "false_alarms_per_normal_hour": 250.93833780160858
+        },
+        "valve2/2": {
+          "rows": 1129,
+          "positive_rows": 395,
+          "tp": 368,
+          "fp": 224,
+          "fn": 27,
+          "tn": 510,
+          "precision": 0.6216216216216216,
+          "recall": 0.9316455696202531,
+          "f1": 0.745694022289767,
+          "average_precision": 0.7146567718264624,
+          "roc_auc": 0.8532369882385404,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            30.0
+          ],
+          "false_alarm_onsets": 50,
+          "normal_hours": 0.2038888888888889,
+          "false_alarms_per_normal_hour": 245.23160762942777
+        },
+        "valve2/3": {
+          "rows": 995,
+          "positive_rows": 395,
+          "tp": 318,
+          "fp": 256,
+          "fn": 77,
+          "tn": 344,
+          "precision": 0.554006968641115,
+          "recall": 0.8050632911392405,
+          "f1": 0.6563467492260062,
+          "average_precision": 0.613001687358828,
+          "roc_auc": 0.7165105485232067,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            15.0
+          ],
+          "false_alarm_onsets": 51,
+          "normal_hours": 0.16666666666666666,
+          "false_alarms_per_normal_hour": 306.0
+        }
+      }
+    },
+    "metric_correction": "Corrected pandas microsecond/nanosecond conversion in normal exposure. Model, threshold, predictions and all non-exposure metrics unchanged. Original metadata and evaluation retained locally."
+  }
+}
