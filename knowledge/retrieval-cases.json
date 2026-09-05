@@ -1,0 +1,14 @@
+{
+  "purpose": "Small development regression set, authored with this corpus. Not an independent NLP benchmark.",
+  "cases": [
+    {"query": "flow pressure operating setpoint", "expected": ["flow-context"]},
+    {"query": "vibration accelerometer channels", "expected": ["vibration-context"]},
+    {"query": "current voltage operating regime", "expected": ["electrical-context"]},
+    {"query": "motor temperature circulating fluid thermocouple", "expected": ["thermal-context"]},
+    {"query": "missing timestamps sampling gaps", "expected": ["sampling-gaps"]},
+    {"query": "anomaly score failure probability diagnosis", "expected": ["baseline-scope"]},
+    {"query": "anomaly changepoint source labels evaluation", "expected": ["annotation-scope"]},
+    {"query": "renaissance sonnet planetary astronomy", "expected": []},
+    {"query": "sourdough pastry baking recipe", "expected": []}
+  ]
+}

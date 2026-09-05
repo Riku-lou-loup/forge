@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "title": "FORGE analytical review notes",
+  "version": "1.0",
+  "license": "Apache-2.0",
+  "authorship": "Project-authored analytical guidance; not an equipment manufacturer's manual",
+  "scope": "Review of recorded SKAB pump measurements. No physical maintenance instructions or validated fault diagnoses.",
+  "passages": [
+    {
+      "id": "flow-context",
+      "title": "Flow readings and operating context",
+      "sensors": ["Volume Flow RateRMS", "Pressure"],
+      "text": "An unusual volume flow rate or pressure reading warrants a comparison with the operating mode and nearby pressure and flow measurements. Ask whether the operating setpoint changed. A deviation from pooled normal readings does not establish a blockage, leak, or pump failure.",
+      "check": "Compare flow and pressure during the alert with the preceding measurements and request the operating setpoint."
+    },
+    {
+      "id": "vibration-context",
+      "title": "Vibration readings need corroboration",
+      "sensors": ["Accelerometer1RMS", "Accelerometer2RMS"],
+      "text": "Accelerometer RMS values summarize vibration magnitude. A change in either vibration channel can be reviewed alongside the other channel and the operating mode. These RMS measurements alone do not identify a bearing defect or a specific mechanical fault; a diagnosis would require additional evidence.",
+      "check": "Compare both accelerometer channels around the alert and request information about operating-mode changes."
+    },
+    {
+      "id": "electrical-context",
+      "title": "Current and voltage context",
+      "sensors": ["Current", "Voltage"],
+      "text": "Review unusual current or voltage measurements together with flow and the operating mode. Sensor deviations can reflect a different operating regime. Anomaly scores do not identify an electrical fault or justify an equipment action.",
+      "check": "Compare current and voltage before and during the alert and request the operating regime."
+    },
+    {
+      "id": "thermal-context",
+      "title": "Motor and fluid temperature context",
+      "sensors": ["Temperature", "Thermocouple"],
+      "text": "The Temperature channel measures the motor body and the Thermocouple channel measures the circulating fluid. Review their trends separately and together with current and operating duration. This analytical baseline contains no manufacturer temperature limits and cannot determine whether a measured temperature is unsafe.",
+      "check": "Compare motor-body and fluid temperatures over the recording and request the applicable manufacturer limits."
+    },
+    {
+      "id": "sampling-gaps",
+      "title": "Gaps and recording boundaries",
+      "sensors": [],
+      "text": "Missing timestamps are gaps in observation, not measured normal behavior. The alert counter resets across gaps longer than two seconds. Review the sampling audit before interpreting an apparent transition, and do not interpolate labels to create evidence.",
+      "check": "Inspect timestamps and sampling gaps around the selected alert."
+    },
+    {
+      "id": "baseline-scope",
+      "title": "A statistical alert is not a diagnosis",
+      "sensors": [],
+      "text": "The detector compares instantaneous sensor readings with normal observations from one laboratory testbed. Its anomaly score is not a failure probability. A persistent alert marks measurements for review. It does not establish a root cause, remaining useful life, or saved downtime.",
+      "check": "Confirm that the asset and operating regime match the reference data before interpreting the alert."
+    },
+    {
+      "id": "annotation-scope",
+      "title": "Annotations describe the source experiment",
+      "sensors": [],
+      "text": "SKAB anomaly annotations mark anomalous observations, while change-point annotations mark transitions. They are used for evaluation and are not detector inputs or live investigation evidence. An experiment identifier must not be used to retrieve a known fault label as if the detector had diagnosed it.",
+      "check": "Keep source annotations separate from model predictions and from the evidence used to draft an investigation."
+    }
+  ],
+  "source_references": [
+    {
+      "title": "SKAB data documentation (sensor and annotation definitions)",
+      "url": "https://github.com/waico/SKAB/blob/b2c0d46c2971dcbfe71e26087b6d231998bb91c2/data/README.md"
+    },
+    {
+      "title": "FORGE evaluation protocol (alert behavior and scope)",
+      "path": "docs/evaluation-protocol.md"
+    }
+  ]
+}

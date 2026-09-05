@@ -1,4 +1,4 @@
-"""Development commands; no model calls or dataset downloads."""
+"""Local training, evaluation, investigation, and application commands."""
 
 import argparse
 import json
@@ -37,7 +37,8 @@ def environment_report() -> dict:
         "isolated_environment": sys.prefix != sys.base_prefix,
         "packages": packages,
         "model_configured": settings.model_configured,
-        "stage": "foundation; no trained model or investigation pipeline yet",
+        "stage": "anomaly detector and local evidence investigation",
+        "trained_artifact_present": (PROJECT_ROOT / "models/latest.json").exists(),
     }
 
 
@@ -45,9 +46,42 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="FORGE development workspace")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("doctor", help="Check the interpreter and installed stack")
-    app = commands.add_parser("app", help="Start the local foundation dashboard")
+    commands.add_parser("train", help="Fit on normal training rows and select on validation")
+    evaluation = commands.add_parser("evaluate", help="Evaluate the frozen model on held-out data")
+    evaluation.add_argument("--allow-test", action="store_true")
+    investigation = commands.add_parser("investigate", help="Draft a local evidence report")
+    investigation.add_argument(
+        "--recording", default="valve1/1", help="Training or validation recording ID"
+    )
+    investigation.add_argument(
+        "--export", action="store_true", help="Save an unreviewed JSON and Markdown draft"
+    )
+    app = commands.add_parser("app", help="Start the local investigation dashboard")
     app.add_argument("--port", type=int, default=8511)
     args = parser.parse_args()
+    if args.command in {"train", "evaluate", "investigate"}:
+        try:
+            from forge.ml.training import evaluate_test, train
+
+            if args.command == "train":
+                folder, _ = train()
+                print(f"Frozen model: {folder}")
+            elif args.command == "evaluate":
+                print(json.dumps(evaluate_test(allow_test=args.allow_test), indent=2))
+            else:
+                from forge.agents.service import investigate_recording
+                from forge.reports.incident import export, markdown
+
+                report = investigate_recording(args.recording)
+                if args.export:
+                    for path in export(report, PROJECT_ROOT / "reports/incidents"):
+                        print(path)
+                else:
+                    print(markdown(report))
+            return 0
+        except (ValueError, OSError, KeyError) as error:
+            print(f"FORGE: {error}", file=sys.stderr)
+            return 2
     if args.command == "doctor":
         report = environment_report()
         print(json.dumps(report, indent=2))
