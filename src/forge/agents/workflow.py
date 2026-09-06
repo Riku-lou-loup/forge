@@ -157,7 +157,14 @@ def investigate(
         return {"query": query, "attempts": 0, "status": "seeking_evidence"}
 
     def retrieve(state):
-        evidence = retriever.search(state["query"]) if retriever is not None else []
+        try:
+            evidence = retriever.search(state["query"]) if retriever is not None else []
+        except (OSError, ValueError, KeyError):
+            evidence = []
+        if not isinstance(evidence, list) or any(
+            not isinstance(item, Evidence) for item in evidence
+        ):
+            return {"status": "grounding_failed", "evidence": [], "attempts": state["attempts"] + 1}
         return {
             "evidence": evidence,
             "attempts": state["attempts"] + 1,
@@ -269,7 +276,7 @@ def investigate(
         "retrieve",
         lambda s: (
             "finalize"
-            if s["status"] == "budget_exhausted"
+            if s["status"] in {"budget_exhausted", "grounding_failed"}
             else ("draft" if s.get("evidence") else "refine" if s["attempts"] < 2 else "finalize")
         ),
     )

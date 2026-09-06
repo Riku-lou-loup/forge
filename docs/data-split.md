@@ -2,7 +2,8 @@
 
 FORGE uses a fixed allocation of complete recordings before baseline training.
 The inventory contains 35 CSV files, comprising 34 annotated recordings and one
-separate normal-operation recording. No detector has been fitted or evaluated.
+separate normal-operation recording. This allocation was fixed before fitting;
+the resulting benchmark is documented in [evaluation](evaluation.md).
 
 ## Source and scope
 
@@ -71,7 +72,7 @@ found no exact repeated sensor vectors or shared timestamps across partitions.
 These checks cannot establish that all temporal or operating-condition dependence
 has been removed.
 
-## Rules for the forthcoming baseline
+## Baseline rules
 
 - Fit on normal-labeled observations from training files plus the source-designated
   normal-operation file. Keep the normal-operation file without annotation columns.
@@ -89,8 +90,9 @@ has been removed.
   leakage group. Overlapping files cannot be treated as independent replicates.
 
 The [modeling notebook](../notebooks/02_baseline_modeling.ipynb) implements normal
-training-row selection, deduplication, and feature/provenance separation. Model
-fitting, validation selection, and scoring remain subsequent milestones.
+training-row selection, deduplication, and feature/provenance separation. Reusable
+training and scoring now live in `src/forge/ml/`; the precise alert and metric
+definitions are in the [evaluation protocol](evaluation-protocol.md).
 
 ## Reproduction
 

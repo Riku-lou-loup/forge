@@ -33,7 +33,7 @@ def render_recording() -> None:
     columns[2].metric("Rows labeled anomalous", audit["anomalous_rows"])
     st.caption(
         f"SKAB / {manifest['experiment_id']} · source time zone unspecified · "
-        "development sample, excluded from the future final test set"
+        "development sample, excluded from the held-out test set"
     )
     st.caption(
         "The sample spans 20 minutes with 56 two-second gaps. Lines connect recorded "
@@ -67,7 +67,7 @@ def render_recording() -> None:
     st.plotly_chart(chart, width="stretch")
     st.info(
         "The colored points show labels supplied with the dataset. They are not model "
-        "predictions. No detector has been trained."
+        "predictions. Model scores are available in the Investigate tab."
     )
     with st.expander("See the rows and data-quality audit"):
         st.dataframe(frame.head(10), hide_index=True, width="stretch")

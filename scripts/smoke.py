@@ -26,7 +26,14 @@ with patch.dict(os.environ, {"LANGSMITH_TRACING": "false", "LANGCHAIN_TRACING_V2
     assert graph.compile().invoke({})["ready"]
 app = AppTest.from_file(str(PROJECT_ROOT / "src/forge/ui/app.py")).run(timeout=45)
 assert not app.exception, str(app.exception)
-assert len(app.tabs) == 4
+assert len(app.tabs) == 5
 assert any("evidence" in heading.value for heading in app.title)
-print("PASS: numerical stack, ML import, chart, LangGraph execution, and Streamlit rendering.")
-print("No model API called. This smoke check does not evaluate the future product.")
+if (PROJECT_ROOT / "models/latest.json").exists():
+    from forge.agents.service import investigate_recording
+
+    report = investigate_recording("valve1/1")
+    assert report.status in {"needs_review", "no_alert", "insufficient_evidence"}
+    assert report.trace and report.review_status == "unreviewed"
+    print(f"PASS: real recording investigation returned {report.status}.")
+print("PASS: numerical stack, chart, LangGraph execution, and Streamlit rendering.")
+print("No model API called. Software smoke checks are separate from the saved ML benchmark.")

@@ -114,3 +114,42 @@ def test_retrieval_rejects_unrelated_query_and_changed_passage():
 def test_test_partition_is_unavailable_to_casual_investigation():
     with pytest.raises(ValueError, match="test is reserved"):
         load_development_recording("valve1/15")
+
+
+def test_expired_time_budget_cannot_propose_checks(inputs):
+    report = investigate(*inputs, retriever=Retriever(), budget=Budget(max_seconds=1e-12))
+    assert report.status == "budget_exhausted" and not report.suggested_checks
+
+
+def test_malformed_retrieval_output_is_rejected(inputs):
+    class MalformedRetriever(Retriever):
+        def search(self, query, **kwargs):
+            return [{"check": "unsupported tool response"}]
+
+    report = investigate(*inputs, retriever=MalformedRetriever())
+    assert report.status == "grounding_failed" and not report.evidence
+
+
+def test_retrieval_error_retries_then_abstains(inputs):
+    class UnavailableRetriever(Retriever):
+        def search(self, query, **kwargs):
+            raise OSError("Local index unavailable")
+
+    report = investigate(*inputs, retriever=UnavailableRetriever())
+    assert report.status == "insufficient_evidence"
+    assert report.trace[-1]["tool_calls"] == 3
+
+
+def test_wrong_document_version_is_not_verified():
+    retriever = Retriever()
+    evidence = retriever.search("flow pressure")[0]
+    assert not retriever.verifies(replace(evidence, version="old-version"))
+
+
+def test_disclosed_retrieval_regression_cases():
+    from forge.rag.evaluate import evaluate_retrieval
+
+    result = evaluate_retrieval()
+    assert result["recall_at_3"] == 1
+    assert result["correct_abstentions"] == result["expected_abstentions"] == 2
+    assert all(case["citations_verified"] for case in result["results"])

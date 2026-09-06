@@ -2,29 +2,32 @@
 
 Equipment anomaly investigation using sensor measurements and technical documents.
 
-FORGE is being developed to investigate equipment anomalies through time-series
-analysis and document retrieval, with findings collected in a maintenance report
-for review. The current application explores real pump measurements from the
-Skoltech Anomaly Benchmark (SKAB).
+FORGE turns recorded pump measurements into an investigation draft: a trained
+detector finds a persistent anomaly, a bounded workflow retrieves relevant
+analytical guidance, and a reviewer can inspect the citations and export the result.
+The application uses real measurements from the Skoltech Anomaly Benchmark (SKAB).
 
-The project is in early development. Data loading, validation, and interactive
-exploration are implemented. Anomaly detection, RAG, and agent orchestration remain
-planned work, with model performance and operational impact still to be evaluated.
+The first frozen detector reached **0.616 F1** and detected **18 of 23 events** on
+held-out recordings. Its **145.4 false alert onsets per normal hour** make it a
+research baseline, not a deployment-ready warning system. The
+[evaluation report](docs/evaluation.md) explains the comparison and limitations.
+
+The investigation runs locally with policy agents and extractive retrieval.
+There are no LLM calls or generated fault diagnoses. LLM-assisted drafting and
+equipment-specific documentation remain future work.
 
 ## What works today
 
-- Download one SKAB experiment from a pinned revision and verify its SHA-256 hash.
-- Validate timestamps, sensor values, and annotation columns without filling gaps.
-- Explore eight sensor channels and their source-provided anomaly annotations.
-- Inspect the recording's data-quality audit, provenance, and sampling intervals.
-- Reproduce a pinned 35-file inventory and validate training, validation, and test
-  assignments that keep overlapping recordings together. See the
-  [data split protocol](docs/data-split.md).
-- Run loader tests and application smoke checks without a model API key.
+- Validate pinned source files and keep overlapping recordings in the same split.
+- Train on 18,306 unique normal observations, select on validation, and evaluate
+  a frozen model on explicitly enabled test data.
+- Inspect sensor traces, anomaly scores, and causal persistent alerts in Streamlit.
+- Retrieve versioned passages using TF-IDF and verify copied checks against citations.
+- Trace the LangGraph workflow, including abstention and exhausted-budget outcomes.
+- Record a named human review and export Markdown or JSON with provenance.
 
-The sample contains 1,145 observations over 20 minutes. Chart highlights show the
-dataset's annotations, and detector predictions remain to be implemented. This
-recording is reserved for development and excluded from the final test set.
+The 1,145-row development sample remains excluded from the held-out test set.
+Source annotations are optional overlays, clearly separate from model predictions.
 
 ## Quick start
 
@@ -35,7 +38,9 @@ repository folder, run these commands in PowerShell:
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 .\.venv\Scripts\python.exe -m pip install --no-deps --no-build-isolation -e .
-.\.venv\Scripts\python.exe -m forge.data.sample --download
+.\.venv\Scripts\python.exe -m forge.data.partitions --split train --download --audit
+.\.venv\Scripts\python.exe -m forge.data.partitions --split validation --download --audit
+.\.venv\Scripts\python.exe -m forge train
 .\.venv\Scripts\python.exe -m forge app
 ```
 
@@ -43,30 +48,59 @@ Open [the local application](http://127.0.0.1:8511). Stop it with Ctrl+C.
 After setup, `start.cmd` also launches the app. Use `-m forge app --port 8512`
 if the default port is occupied. Always use the repository's `.venv` interpreter.
 
-The sample is downloaded from the upstream source. Raw data stays outside Git.
-An API key, database server, and hardware are not required for the current app.
+In **Investigate**, select `valve1/1`, choose **Investigate alert**, inspect the
+measurements and citations, and download the draft. To record a review, enter
+your name and acknowledge the evidence and limitations before selecting
+**Mark reviewed**. This does not authorize equipment actions.
+
+Data is downloaded from the pinned upstream source. Raw data and generated models
+stay outside Git. An API key, database server, and hardware are not required.
 The dependency snapshot records the development environment. Other platforms
 have not been validated.
 
+For a command-line draft:
+
+```powershell
+.\.venv\Scripts\python.exe -m forge investigate --recording valve1/1 --export
+```
+
+This writes an unreviewed report under `reports/incidents/`. Without `--export`,
+the Markdown is printed. Only training and validation recordings are available
+for interactive investigation.
+
+To reproduce held-out evaluation after freezing selection:
+
+```powershell
+.\.venv\Scripts\python.exe -m forge.data.partitions --split test --download --audit --allow-test
+.\.venv\Scripts\python.exe -m forge evaluate --allow-test
+```
+
+The result is saved beside the model and reused on subsequent evaluation calls.
+Do not tune on this test set. The tracked report describes the recorded benchmark
+run; later training runs do not silently replace it. Model artifacts are trusted
+local pickle files: load only artifacts produced by your own training command.
+
 ## Stack
 
-Python, NumPy, pandas, Plotly, and Streamlit support the implemented data explorer.
-scikit-learn, pypdf, LangGraph, and langchain-openai are installed for planned
-modeling and retrieval work. Those features remain to be implemented. pytest and
-Ruff provide software checks.
+Python, NumPy, pandas, scikit-learn, Plotly, Streamlit, LangGraph and Pydantic
+support the implemented workflow. pytest and Ruff provide software checks.
+pypdf and langchain-openai remain installed for later document ingestion and
+provider integration; neither is part of the current investigation path.
 
 ## Repository layout
 
 ```text
 src/forge/data/       Recording loading, provenance, and validation
-src/forge/ui/         Streamlit recording explorer
-src/forge/ml/         Anomaly detection (planned)
-src/forge/rag/        Document retrieval (planned)
-src/forge/agents/     Investigation workflow (planned)
-src/forge/reports/    Report export (planned)
+src/forge/ui/         Streamlit investigation, explorer and benchmark
+src/forge/ml/         Detectors, selection, metrics and local artifacts
+src/forge/rag/        Lexical retrieval and regression evaluation
+src/forge/agents/     Bounded investigation graph and application boundary
+src/forge/reports/    Structured reports, human review and export
+knowledge/           Versioned original analytical passages and query fixtures
+configs/             Fixed model-selection protocol
 data/                Tracked manifest and ignored local data directories
 docs/                Public architecture and evaluation documentation
-tests/               Recording validation tests
+tests/               Data, model, evidence, artifact and UI behavior
 scripts/             Environment setup and verification
 ```
 
@@ -87,9 +121,12 @@ If PowerShell blocks scripts, run the checks directly:
 .\.venv\Scripts\python.exe scripts\smoke.py
 ```
 
-Tests use small synthetic fixtures to verify software behavior. The smoke check
-exercises dependencies and renders the Streamlit app. These checks make no model
-API requests. ML benchmarking remains separate work.
+Tests use small synthetic fixtures to verify software behavior, including actual
+Streamlit review controls. The smoke check renders the app and, when a trained
+artifact is present, runs an investigation on the development recording. These
+checks make no model API requests. The saved [ML benchmark](docs/evaluation.md)
+uses real held-out data. Run `python -m forge.rag.evaluate` for the separately
+disclosed, nine-query retrieval regression set.
 
 ## Data provenance and limitations
 
@@ -98,7 +135,7 @@ and Vyacheslav O. Kozitsin. [The sample manifest](data/sample-manifest.json) rec
 the experiment, exact source revision, checksum, attribution, and upstream license
 reference. See [data notes](data/README.md) for sensor and sampling details.
 
-SKAB contains laboratory measurements. Results on this data would not establish
+SKAB contains laboratory measurements. Results on this data do not establish
 factory reliability, exact fault diagnosis, remaining useful life, or saved downtime.
 Anomaly and change-point labels are evaluation annotations and are excluded from
 model inputs. Source attribution remains part of the public repository.
@@ -120,8 +157,9 @@ Third-party dependencies, SKAB data, and external documents retain their own lic
 
 ## Local configuration
 
-`.env.example` documents future model settings with calls disabled and no key.
-Keep credentials in the ignored `.env` file. Model-provider integration is pending.
+`.env.example` reserves future provider settings. The current pipeline makes no
+LLM calls, even if those variables are set. Keep credentials in the ignored
+`.env` file. Provider integration requires a separate implementation and budget.
 
 Environments, raw data, generated models and reports, local assistant configuration,
 and private development notes are excluded from Git. Portable editor settings,

@@ -16,7 +16,9 @@ DEPENDENCIES = (
     "plotly",
     "streamlit",
     "langgraph",
+    "langsmith",
     "langchain-openai",
+    "pydantic",
     "pydantic-settings",
     "pypdf",
 )
