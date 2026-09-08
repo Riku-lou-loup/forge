@@ -11,6 +11,12 @@ and examines the pressure channel's zero MAD. The user's original modeling
 cells are preserved. Reusable training now lives in `src/forge/ml/`, with its
 results in [the benchmark report](../docs/evaluation.md).
 
+[Validation score separation](03_validation_diagnostics.ipynb) compares the frozen
+detector's normal and anomalous score distributions on validation groups. It
+reports raw ranking and persistent alert rates separately, and exports local
+interactive and static figures without refitting or changing the threshold.
+See [the findings](../docs/validation-diagnostics.md).
+
 ## Reproduction
 
 Install the environment using the project's [quick start](../README.md#quick-start).
