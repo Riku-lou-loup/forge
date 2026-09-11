@@ -1,0 +1,20 @@
+{
+  "protocol": "forge-development-v2",
+  "seed": 42,
+  "objective": "Reduce false positives subject to retained detection, using development validation only.",
+  "minimum_point_recall": 0.85,
+  "minimum_event_recall": 0.8,
+  "minimum_group_point_recall": 0.5,
+  "target_false_positive_rate": 0.05,
+  "target_false_alarm_onsets_per_normal_hour": 6.0,
+  "persistence_candidates": [3, 5],
+  "max_gap_seconds": 2,
+  "threshold_quantiles": 101,
+  "reference_readings": 60,
+  "rolling_readings": 20,
+  "extra_trees": {"n_estimators": 256, "min_samples_leaf": 5, "max_features": 1.0, "n_jobs": 2},
+  "candidate_features": ["raw", "causal", "relative"],
+  "additional_candidates": ["frozen_isolation_forest", "robust_max", "relative_isolation_forest"],
+  "selection": "Among candidates meeting all recall floors, minimize validation false-positive rate, then false onset rate, then maximize F1; ties prefer earlier candidates. Report target attainment separately. If no candidate meets the floors, retain the old default and report the frontier.",
+  "evaluation_scope": "Previously inspected validation, used for development selection. No new test access; no claim of independent generalization."
+}
