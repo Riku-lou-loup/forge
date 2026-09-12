@@ -6,11 +6,13 @@ develop a lower-alert operating point. The already inspected test partition is
 not used for selection or rescored. Any new generalization claim requires a new
 evaluation plan and fresh holdout.
 
-The balanced objective requires pooled point recall of at least 0.85, event recall
-of at least 0.80, and point recall of at least 0.50 in every validation group with
-anomalies. Among feasible choices, minimize point false-positive rate, then false
-alert onsets per normal hour, then maximize F1. Targets of at most 5% point FPR
-and six false onsets per normal hour are development targets, not industry safety
+The user chose precision priority before any new candidate was fitted: fewer
+alerts even if more anomalies are missed. Require pooled point recall of at least
+0.60, event recall of at least 0.60, and point recall of at least 0.20 in every
+validation group with anomalies to prevent a nearly silent detector from winning.
+Among feasible choices, maximize precision, then minimize false alert onsets per
+normal hour, then maximize point recall. Targets of at least 95% precision, at
+most 1% point FPR and two false onsets per normal hour are development targets, not industry safety
 requirements. Show per-group results, alert delay and coverage alongside aggregates.
 These criteria are in `configs/improvement-v2.json` before fitting new candidates.
 
