@@ -1,0 +1,16 @@
+{
+  "stage": "development-followup-1",
+  "reason": "Initial relative Extra Trees improves precision but leaves sustained false alerts. Compare record-relative scale definitions and a regularized boosted classifier. Selection criteria remain unchanged.",
+  "gradient_boosting": {"max_iter": 200, "max_leaf_nodes": 7, "min_samples_leaf": 30, "l2_regularization": 10.0, "learning_rate": 0.05, "early_stopping": false},
+  "followup_candidates": [
+    {"estimator": "extra_trees", "representation": "relative_noise"},
+    {"estimator": "extra_trees", "representation": "relative_fraction"},
+    {"estimator": "gradient_boosting", "representation": "relative"},
+    {"estimator": "gradient_boosting", "representation": "relative_noise"},
+    {"estimator": "gradient_boosting", "representation": "relative_fraction"},
+    {"estimator": "gradient_boosting", "representation": "causal"}
+  ],
+  "relative_noise_scale": "Maximum of initial-reference scaled MAD, IQR/1.349, and 0.05 times the global training robust scale.",
+  "relative_fraction_scale": "Maximum of the absolute initial-reference median and the global training robust scale.",
+  "scope": "Additional development comparisons informed by the first validation run, not a new holdout."
+}
