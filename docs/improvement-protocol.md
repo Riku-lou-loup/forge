@@ -40,6 +40,19 @@ are preserved across gaps rather than relearned from a potentially faulty segmen
 No window crosses a recording/group boundary. Global scaling is fitted on normal
 training rows only.
 
+### Serving-boundary correction
+
+The first implementation initialized relative features on merged overlap groups,
+which did not match the application's per-CSV initialization. Those initial
+development results are retained as provisional artifacts and cannot be used to
+promote a model. Schema version 2 initializes and computes features separately
+for each source recording, then deduplicates observations before fitting or
+evaluation. For a shared observation, the first inventory occurrence supplies
+its prediction context; annotation conflicts remain unknown. Group weights and
+reported metrics still use leakage groups. This correction changes neither the
+selection objective nor the allowed training/validation partitions. Both declared
+comparison stages are rerun with the corrected boundary.
+
 The relative representation initializes a reference from the first 60 sensor
 readings, with no label lookup. Scoring after reference initialization assumes
 those initial readings represent an appropriate operating reference. This is an

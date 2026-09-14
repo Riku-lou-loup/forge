@@ -5,9 +5,9 @@ import pandas as pd
 import pytest
 
 from forge.data.datasets import FEATURES
-from forge.ml.development import fast_alerts, selection_metrics
+from forge.ml.development import fast_alerts, score_streams, selection_metrics
 from forge.ml.metrics import causal_alerts, evaluate
-from forge.ml.operating import causal_features
+from forge.ml.operating import OperatingDetector, causal_features
 
 
 def recording(length=100):
@@ -109,3 +109,22 @@ def test_startup_anomalies_are_misses_and_normal_exposure_is_not_padded():
     assert metrics["unavailable_anomaly_rows"] == 2
     assert metrics["available_normal_rows"] == 0
     assert metrics["fpr_available_normal"] is None
+
+
+def test_overlapping_source_files_keep_separate_startup_references():
+    class ReferenceProbe(OperatingDetector):
+        def score(self, frame):
+            values, ready = self.transform(frame)
+            return np.where(ready, values[:, 0], 0)
+
+    full = recording(160)
+    full["_group"] = "overlap"
+    first, second = full.iloc[:100].copy(), full.iloc[80:].copy()
+    detector = ReferenceProbe(
+        "probe", np.zeros(8), np.ones(8), ["test"] * 8, representation="relative"
+    )
+    scores, ready = score_streams(detector, {"first": first, "second": second})
+    expected = np.r_[detector.score(first), detector.score(second)[20:]]
+    np.testing.assert_array_equal(scores["overlap"], expected)
+    assert not ready["overlap"][100:140].any()
+    assert ready["overlap"][140:].all()

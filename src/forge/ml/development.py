@@ -4,6 +4,7 @@ import hashlib
 import json
 import pickle
 from datetime import UTC, datetime
+from importlib.metadata import version
 from pathlib import Path
 from uuid import uuid4
 
@@ -12,7 +13,7 @@ import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, IsolationForest
 
 from forge.config import PROJECT_ROOT
-from forge.data.datasets import evaluation_groups, merge_group, normal_training
+from forge.data.datasets import OBSERVATION_KEY, merge_group, normal_training
 from forge.data.partitions import inspect_recording, read_plan, select_records
 from forge.ml.detectors import Detector
 from forge.ml.metrics import evaluate, starts
@@ -20,19 +21,46 @@ from forge.ml.operating import OperatingDetector
 from forge.ml.training import digest, load_model, write_json
 
 
-def training_groups(root=PROJECT_ROOT):
+def development_streams(partition, root=PROJECT_ROOT):
+    if partition not in {"train", "validation"}:
+        raise ValueError("Development streams permit training and validation only.")
     inventory, plan = read_plan(root)
-    frames = {}
-    for record in select_records(inventory, plan, "train"):
+    streams = {}
+    for record in select_records(inventory, plan, partition):
         frame = inspect_recording(record, root).copy()
         if not record["annotations_present"]:
             # Internal training target from catalog provenance; source CSV stays unmodified.
             frame["anomaly"] = 0
-        frames.setdefault(record["leakage_group"], []).append(frame)
+        frame["_group"] = record["leakage_group"]
+        streams[record["experiment_id"]] = frame
+    return streams
+
+
+def merge_streams(streams):
+    frames = {}
+    for frame in streams.values():
+        frames.setdefault(frame["_group"].iloc[0], []).append(frame)
     grouped, audits = {}, {}
     for name, items in frames.items():
         grouped[name], audits[name] = merge_group(items)
     return grouped, audits
+
+
+def score_streams(detector, streams):
+    """Initialize each source CSV exactly as serving does, then deduplicate scores."""
+    scored = {}
+    for name, frame in streams.items():
+        result = frame.copy()
+        result["_score"] = detector.score(frame)
+        result["_ready"] = (
+            detector.readiness(frame) if isinstance(detector, OperatingDetector) else True
+        )
+        scored[name] = result
+    groups, _ = merge_streams(scored)
+    return (
+        {name: frame["_score"].to_numpy() for name, frame in groups.items()},
+        {name: frame["_ready"].to_numpy(dtype=bool) for name, frame in groups.items()},
+    )
 
 
 def fast_alerts(scores, timestamps, ready, threshold, persistence, max_gap_seconds):
@@ -52,6 +80,9 @@ def selection_metrics(groups, scores, ready, threshold, policy):
     available_normal = total_normal = unavailable_positive = unavailable_rows = 0
     group_recalls = {}
     for name, frame in groups.items():
+        intervals = np.diff(pd.DatetimeIndex(frame.datetime).as_unit("ns").asi8) / 1e9
+        if (intervals < 1).any():
+            raise ValueError("Development exposure assumes SKAB sampling of at least one second.")
         labels = frame.anomaly.to_numpy(dtype=int)
         valid = labels >= 0
         available = ready[name] & valid
@@ -174,18 +205,22 @@ def fit_operating(
         rolling_readings=config["rolling_readings"],
         max_gap_seconds=config["max_gap_seconds"],
     )
-    inputs, targets, weights = [], [], []
+    inputs, row_frames = [], []
     for frame in groups.values():
         features, ready = detector.transform(frame)
-        eligible = ready & frame.anomaly.ge(0).to_numpy()
-        if not classifier:
-            eligible &= frame.anomaly.eq(0).to_numpy()
-        count = int(eligible.sum())
-        if count:
-            inputs.append(features[eligible])
-            targets.append(frame.anomaly.to_numpy()[eligible])
-            weights.append(np.full(count, 1 / count))
-    x, y, weight = np.concatenate(inputs), np.concatenate(targets), np.concatenate(weights)
+        rows = frame[[*OBSERVATION_KEY, "anomaly", "_group"]].copy()
+        rows["_ready"] = ready
+        row_frames.append(rows)
+        inputs.append(features)
+    rows = pd.concat(row_frames, ignore_index=True)
+    ambiguous = rows.groupby(OBSERVATION_KEY, dropna=False).anomaly.transform("nunique").gt(1)
+    eligible = rows["_ready"] & rows.anomaly.ge(0) & ~ambiguous & ~rows.duplicated(OBSERVATION_KEY)
+    if not classifier:
+        eligible &= rows.anomaly.eq(0)
+    x = np.concatenate(inputs)[eligible.to_numpy()]
+    retained = rows.loc[eligible]
+    y = retained.anomaly.to_numpy()
+    weight = 1 / retained.groupby("_group").anomaly.transform("size").to_numpy()
     weight *= len(weight) / weight.sum()
     if classifier:
         if estimator_kind == "extra_trees":
@@ -217,10 +252,12 @@ def run_development(root=PROJECT_ROOT, *, followup=False):
     if followup:
         config.update(json.loads((root / "configs/improvement-v2-followup.json").read_text()))
     baseline, baseline_metadata, _ = load_model(root)
-    training, training_audit = training_groups(root)
+    training = development_streams("train", root)
+    _, training_audit = merge_streams(training)
     normal, normal_audit = normal_training(root)
     reference = Detector.fit(normal)
-    validation, validation_audit = evaluation_groups("validation", root=root)
+    validation_streams = development_streams("validation", root)
+    validation, validation_audit = merge_streams(validation_streams)
     run_id = "development-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid4().hex[:8]
     folder = root / "models" / run_id
     folder.mkdir(parents=True, exist_ok=False)
@@ -265,13 +302,7 @@ def run_development(root=PROJECT_ROOT, *, followup=False):
     )
     for name, detector, fit_audit in candidates:
         print(f"Selecting operating point: {name}", flush=True)
-        scores = {key: detector.score(frame) for key, frame in validation.items()}
-        ready = {
-            key: detector.readiness(frame)
-            if isinstance(detector, OperatingDetector)
-            else np.ones(len(frame), dtype=bool)
-            for key, frame in validation.items()
-        }
+        scores, ready = score_streams(detector, validation_streams)
         best, scan = threshold_scan(validation, scores, ready, config)
         result = {"name": name, "fit_audit": fit_audit, "best": best, "scan": scan}
         results.append(result)
@@ -284,7 +315,9 @@ def run_development(root=PROJECT_ROOT, *, followup=False):
         else:
             print(f"{name}: no operating point meets the recall floors", flush=True)
     summary = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "sklearn_version": version("scikit-learn"),
+        "prediction_boundary": "Source recording: initialize and compute features before observation deduplication. First inventory occurrence provides prediction context for shared observations.",
         "run_id": run_id,
         "created_at": datetime.now(UTC).isoformat(),
         "config": config,
