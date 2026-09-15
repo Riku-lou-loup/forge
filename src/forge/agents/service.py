@@ -27,7 +27,7 @@ def load_development_recording(experiment_id, root=PROJECT_ROOT):
 
 
 def investigate_recording(experiment_id="valve1/1", *, root=PROJECT_ROOT, budget=Budget()):
-    detector, metadata, _ = load_model(root)
+    detector, metadata, _ = load_model(root, active=True)
     frame, record = load_development_recording(experiment_id, root)
     path = root / "knowledge/playbook.json"
     retriever = Retriever(path) if path.exists() else None

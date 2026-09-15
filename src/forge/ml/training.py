@@ -83,14 +83,17 @@ def train(root=PROJECT_ROOT):
     return folder, metadata
 
 
-def load_model(root=PROJECT_ROOT):
+def load_model(root=PROJECT_ROOT, *, active=False):
     """Load ONLY this workspace's trusted local artifact. Never accept uploads.
 
     Hashes detect accidental corruption, not a maliciously replaced model and
     manifest. Pickle artifacts must come from your own training command.
     """
     root = Path(root)
-    pointer = json.loads((root / "models/latest.json").read_text())
+    pointer_path = root / "models/active.json"
+    if not active or not pointer_path.exists():
+        pointer_path = root / "models/latest.json"
+    pointer = json.loads(pointer_path.read_text())
     folder = (root / "models" / pointer["run_id"]).resolve()
     if folder.parent != (root / "models").resolve():
         raise ValueError("Invalid model run path.")
@@ -103,11 +106,17 @@ def load_model(root=PROJECT_ROOT):
         )
     if digest(folder / "detector.pkl") != metadata["model_sha256"]:
         raise ValueError("Model checksum mismatch.")
-    for name, field in [
+    config_file = metadata.get("config_file", "configs/baseline.json")
+    if config_file not in {"configs/baseline.json", "configs/improvement-v2.json"}:
+        raise ValueError("Unrecognized model configuration.")
+    provenance = [
         ("data/skab-splits.json", "split_sha256"),
         ("data/skab-inventory.json", "inventory_sha256"),
-        ("configs/baseline.json", "config_sha256"),
-    ]:
+        (config_file, "config_sha256"),
+    ]
+    if metadata.get("followup_config_sha256"):
+        provenance.append(("configs/improvement-v2-followup.json", "followup_config_sha256"))
+    for name, field in provenance:
         if digest(root / name) != metadata[field]:
             raise ValueError(
                 f"Training provenance changed: {name}. Use the matching checkout or retrain."

@@ -128,3 +128,46 @@ def test_overlapping_source_files_keep_separate_startup_references():
     np.testing.assert_array_equal(scores["overlap"], expected)
     assert not ready["overlap"][100:140].any()
     assert ready["overlap"][140:].all()
+
+
+def test_fitted_classifier_roundtrip_and_prefix_predictions():
+    import pickle
+
+    from forge.ml.detectors import Detector
+    from forge.ml.development import fit_operating
+
+    frame = recording(150)
+    frame["_group"] = "synthetic"
+    config = {
+        "seed": 42,
+        "reference_readings": 60,
+        "rolling_readings": 20,
+        "max_gap_seconds": 2,
+        "gradient_boosting": {"max_iter": 5, "min_samples_leaf": 5, "early_stopping": False},
+    }
+    detector, audit = fit_operating(
+        Detector.fit(frame.iloc[:70]),
+        {"synthetic": frame},
+        "relative",
+        config,
+        estimator_kind="gradient_boosting",
+    )
+    assert audit["fit_rows"] == 90
+    loaded = pickle.loads(pickle.dumps(detector))
+    scores = detector.score(frame)
+    np.testing.assert_array_equal(loaded.score(frame), scores)
+    np.testing.assert_array_equal(loaded.score(frame.iloc[:100]), scores[:100])
+    assert not scores[:60].any()
+
+
+def test_subsecond_sampling_cannot_silently_inflate_exposure():
+    frame = recording(10)
+    frame["datetime"] = pd.date_range("2020-01-01", periods=10, freq="500ms")
+    with pytest.raises(ValueError, match="sampling"):
+        selection_metrics(
+            {"x": frame},
+            {"x": np.ones(10)},
+            {"x": np.ones(10, dtype=bool)},
+            0.5,
+            {"persistence": 3, "max_gap_seconds": 2},
+        )

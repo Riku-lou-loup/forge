@@ -25,7 +25,7 @@ def test_investigation_review_and_recording_change(monkeypatch, tmp_path):
     }
     record = {"experiment_id": "valve1/1", "sha256": "1" * 64}
     second = {**record, "experiment_id": "valve1/2"}
-    monkeypatch.setattr(ui, "load_model", lambda: (detector, metadata, tmp_path))
+    monkeypatch.setattr(ui, "load_model", lambda **kwargs: (detector, metadata, tmp_path))
     monkeypatch.setattr(ui, "available_recordings", lambda: [record, second])
     monkeypatch.setattr(ui, "recording_path", lambda r: tmp_path)
     monkeypatch.setattr(
@@ -52,7 +52,7 @@ def test_investigation_review_and_recording_change(monkeypatch, tmp_path):
 def test_missing_model_shows_setup_instructions(monkeypatch):
     import forge.ui.investigation as ui
 
-    def absent():
+    def absent(**kwargs):
         raise FileNotFoundError("No local model")
 
     monkeypatch.setattr(ui, "load_model", absent)

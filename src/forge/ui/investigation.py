@@ -2,6 +2,7 @@
 
 import json
 
+import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -19,7 +20,7 @@ def render_investigation():
     st.subheader("Investigate a recording")
     st.caption("Local policy agents · project-authored evidence · no LLM calls")
     try:
-        detector, metadata, _ = load_model()
+        detector, metadata, _ = load_model(active=True)
     except (OSError, ValueError, KeyError) as error:
         st.info("Train the local detector to enable investigations.")
         st.code(r".\.venv\Scripts\python.exe -m forge train", language="powershell")
@@ -43,23 +44,29 @@ def render_investigation():
     try:
         frame, record = load_development_recording(selection)
         scores = detector.score(frame)
-        alerts = causal_alerts(scores, frame.datetime, metadata["threshold"], **metadata["policy"])
+        ready = detector.readiness(frame)
+        displayed_scores = np.where(ready, scores, np.nan)
+        alerts = causal_alerts(
+            displayed_scores, frame.datetime, metadata["threshold"], **metadata["policy"]
+        )
     except (ValueError, OSError) as error:
         st.error(str(error))
         return
     left, middle, right = st.columns(3)
-    left.metric(
-        "Detector", "Isolation Forest" if detector.forest is not None else "Robust deviation"
-    )
+    left.metric("Detector", detector.describe()["family"])
     middle.metric("Alerted observations", f"{int(alerts.sum()):,} / {len(frame):,}")
     right.metric("Frozen threshold", f"{metadata['threshold']:.4f}")
     st.caption(
-        "An alert requires three consecutive readings above the threshold. Scores are not failure probabilities."
+        f"An alert requires {metadata['policy']['persistence']} consecutive readings above the threshold. Scores are not failure probabilities."
     )
+    if (~ready).any():
+        st.info(
+            f"{int((~ready).sum())} initialization readings are unscored. The initial reference must represent an appropriate operating condition; a fault already present at startup may be missed."
+        )
     figure = go.Figure(
         go.Scatter(
             x=frame.datetime,
-            y=scores,
+            y=displayed_scores,
             mode="lines",
             name="Anomaly score",
             line={"color": "#548bff", "width": 1.3},
@@ -83,7 +90,7 @@ def render_investigation():
         figure.add_trace(
             go.Scatter(
                 x=frame.datetime[annotated],
-                y=scores[annotated],
+                y=displayed_scores[annotated],
                 mode="markers",
                 name="Source anomaly annotation",
                 marker={"symbol": "circle-open", "color": "#aa74cf", "size": 7},
@@ -129,7 +136,7 @@ def render_investigation():
         )
         st.dataframe(report.observation["sensor_deviations"], hide_index=True, width="stretch")
         st.caption(
-            "Largest deviations from the pooled normal reference at the peak. These are not causal explanations or forest feature attributions."
+            "Largest deviations from the pooled normal reference at the peak. These are not causal explanations or model feature attributions."
         )
     for check in report.suggested_checks:
         st.write(f"• {check.text} [{check.citation}]")
@@ -179,7 +186,34 @@ def render_investigation():
 
 
 def render_results():
-    st.subheader("Frozen benchmark")
+    improvement_path = PROJECT_ROOT / "docs/improvement-results.json"
+    if improvement_path.exists():
+        improvement = json.loads(improvement_path.read_text(encoding="utf-8"))
+        st.subheader("Precision-focused development comparison")
+        st.caption(
+            "Saved development results; selection used these validation recordings. This is not an independent test of the active model."
+        )
+        st.dataframe(
+            [
+                {
+                    "Model": name,
+                    "Precision": m["precision"],
+                    "Recall": m["recall"],
+                    "False positive readings": m["fp"],
+                    "False alert onsets": m["false_alarm_onsets"],
+                }
+                for name, m in [
+                    ("Original Isolation Forest", improvement["baseline_validation"]),
+                    (improvement["selected"]["name"], improvement["selected"]["metrics"]),
+                ]
+            ],
+            hide_index=True,
+            width="stretch",
+        )
+        st.caption(
+            "Relative features need 60 initialization readings. See docs/improvement-results.md for missed anomalies, startup coverage, alert delay and remaining false alarms."
+        )
+    st.subheader("Original Isolation Forest benchmark")
     path = PROJECT_ROOT / "docs/evaluation-results.json"
     if not path.exists():
         st.info("No benchmark summary has been published in this checkout.")

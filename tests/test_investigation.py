@@ -153,3 +153,22 @@ def test_disclosed_retrieval_regression_cases():
     assert result["recall_at_3"] == 1
     assert result["correct_abstentions"] == result["expected_abstentions"] == 2
     assert all(case["citations_verified"] for case in result["results"])
+
+
+def test_startup_only_recording_abstains_without_retrieval(inputs):
+    from forge.ml.operating import OperatingDetector
+
+    frame, reference, metadata, name, checksum = inputs
+    detector = OperatingDetector(
+        "initializing",
+        reference.center,
+        reference.scale,
+        reference.scale_methods,
+        representation="relative",
+    )
+    report = investigate(frame, detector, metadata, name, checksum, retriever=Retriever())
+    assert report.status == "insufficient_data"
+    assert report.observation["scored_rows"] == 0
+    assert report.observation["initialization_rows"] == len(frame)
+    assert not report.evidence and not report.suggested_checks
+    assert not any(step["node"] == "retrieve" for step in report.trace)

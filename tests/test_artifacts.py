@@ -61,3 +61,62 @@ def test_changed_training_manifest_requires_matching_checkout(saved_model):
     (root / "data/skab-splits.json").write_text('{"changed": true}')
     with pytest.raises(ValueError, match="provenance changed"):
         load_model(root)
+
+
+def test_development_activation_preserves_baseline_and_checks_provenance(saved_model):
+    from forge.ml.activation import activate
+
+    root, baseline_folder, detector, _ = saved_model
+    baseline_pointer = (root / "models/latest.json").read_bytes()
+    folder = root / "models/development-test"
+    folder.mkdir()
+    (folder / "detector.pkl").write_bytes((baseline_folder / "detector.pkl").read_bytes())
+    config = {
+        "minimum_point_recall": 0.6,
+        "minimum_event_recall": 0.6,
+        "minimum_group_point_recall": 0.2,
+    }
+    write_json(root / "configs/improvement-v2.json", config)
+    result = {
+        "schema_version": 2,
+        "run_id": folder.name,
+        "created_at": "synthetic",
+        "sklearn_version": version("scikit-learn"),
+        "config": config,
+        "baseline_validation": {"precision": 0.5},
+        "config_sha256": digest(root / "configs/improvement-v2.json"),
+        "split_sha256": digest(root / "data/skab-splits.json"),
+        "inventory_sha256": digest(root / "data/skab-inventory.json"),
+        "scope": "synthetic test",
+        "selected": {
+            "metrics": {
+                "precision": 0.9,
+                "recall": 0.65,
+                "event_recall": 0.8,
+                "minimum_group_recall": 0.3,
+            },
+            "model_sha256": digest(folder / "detector.pkl"),
+            "descriptor": detector.describe(),
+            "threshold": 1.0,
+            "policy": {"persistence": 5, "max_gap_seconds": 2},
+        },
+    }
+    write_json(folder / "comparison.json", result)
+    activate(folder.name, root)
+    assert load_model(root, active=True)[1]["run_id"] == folder.name
+    assert load_model(root)[1]["run_id"] == baseline_folder.name
+    assert (root / "models/latest.json").read_bytes() == baseline_pointer
+    (root / "configs/improvement-v2.json").write_text("{}")
+    with pytest.raises(ValueError, match="provenance changed"):
+        load_model(root, active=True)
+    with pytest.raises(ValueError, match="provenance changed"):
+        activate(folder.name, root)
+    assert load_model(root)[1]["run_id"] == baseline_folder.name
+
+
+def test_active_loader_falls_back_only_when_pointer_is_absent(saved_model):
+    root, folder, _, _ = saved_model
+    assert load_model(root, active=True)[1]["run_id"] == folder.name
+    write_json(root / "models/active.json", {"run_id": "../../outside"})
+    with pytest.raises(ValueError, match="Invalid model run path"):
+        load_model(root, active=True)

@@ -35,7 +35,12 @@ class IncidentReport(BaseModel):
     model_sha256: str
     mode: Literal["local_policy_and_extractive_retrieval"] = "local_policy_and_extractive_retrieval"
     status: Literal[
-        "needs_review", "no_alert", "insufficient_evidence", "budget_exhausted", "grounding_failed"
+        "needs_review",
+        "no_alert",
+        "insufficient_evidence",
+        "budget_exhausted",
+        "grounding_failed",
+        "insufficient_data",
     ]
     summary: str
     observation: dict = Field(default_factory=dict)

@@ -44,9 +44,13 @@ class Detector:
             return -self.forest.score_samples(sensor_matrix(frame))
         return np.abs(self.deviations(frame)).max(axis=1)
 
+    def readiness(self, frame):
+        return np.ones(len(frame), dtype=bool)
+
     def describe(self):
         return {
             "name": self.name,
+            "family": "Isolation Forest" if self.forest is not None else "Robust deviation",
             "features": FEATURES,
             "center": self.center.tolist(),
             "scale": self.scale.tolist(),

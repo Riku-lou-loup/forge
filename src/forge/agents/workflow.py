@@ -105,10 +105,22 @@ def investigate(
 
     def observe(state):
         scores = detector.score(frame)
-        alerts = causal_alerts(scores, frame.datetime, metadata["threshold"], **metadata["policy"])
+        ready = detector.readiness(frame)
+        alerts = causal_alerts(
+            np.where(ready, scores, -np.inf),
+            frame.datetime,
+            metadata["threshold"],
+            **metadata["policy"],
+        )
         onsets = starts(alerts, frame.datetime, metadata["policy"]["max_gap_seconds"])
         observation = {
             "rows": len(frame),
+            "scored_rows": int(ready.sum()),
+            "initialization_rows": int((~ready).sum()),
+            "detector": detector.describe()["family"],
+            "initialization_requirement": detector.describe().get(
+                "initialization_requirement", "No startup reference required."
+            ),
             "score_max": float(scores.max()),
             "threshold": metadata["threshold"],
             "alert_policy": metadata["policy"],
@@ -118,6 +130,8 @@ def investigate(
                 frame.datetime.diff().dt.total_seconds().gt(2).sum()
             ),
         }
+        if not ready.any():
+            return {"status": "insufficient_data", "observation": observation}
         if not len(onsets):
             return {"status": "no_alert", "observation": observation}
         # Highest-scoring persistent episode, selected without looking at labels.
@@ -151,7 +165,7 @@ def investigate(
         return {"status": "observed", "observation": observation}
 
     def triage(state):
-        if state["status"] == "no_alert":
+        if state["status"] in {"no_alert", "insufficient_data"}:
             return {}
         query = " ".join(item["sensor"] for item in state["observation"]["sensor_deviations"])
         return {"query": query, "attempts": 0, "status": "seeking_evidence"}
@@ -202,6 +216,7 @@ def investigate(
         summaries = {
             "needs_review": "A persistent anomaly alert was found. Retrieved analytical checks are ready for human review; no root cause has been established.",
             "no_alert": "No persistent alert was found at the frozen threshold. This does not establish normal or safe equipment operation.",
+            "insufficient_data": "The recording contains only initialization readings. No anomaly assessment is available; provide more readings from the same recording.",
             "insufficient_evidence": "An alert was found, but the available corpus did not support an analytical check. Request applicable documentation.",
             "budget_exhausted": "The investigation stopped at its execution budget. Any partial observations require a new review; no checks are proposed.",
             "grounding_failed": "The draft failed citation verification. Unsupported guidance was removed.",
@@ -234,8 +249,11 @@ def investigate(
             suggested_checks=state.get("checks", []) if supported else [],
             limitations=[
                 "Recorded laboratory data from one SKAB testbed; no deployment reliability claim.",
-                "Instantaneous anomaly scores are not diagnoses or failure probabilities.",
-                "Robust sensor deviations describe a pooled reference; they are not Isolation Forest feature attribution.",
+                "Anomaly scores are not diagnoses or calibrated physical failure probabilities.",
+                "Robust sensor deviations describe a pooled reference; they are not model feature attribution.",
+                detector.describe().get(
+                    "initialization_requirement", "No startup reference required."
+                ),
                 "The corpus is project-authored review guidance, not a manufacturer manual.",
                 "Operating setpoints, manufacturer limits and asset history are unavailable.",
                 "Local policy agents and extractive drafting were used; no LLM was called.",
@@ -270,7 +288,11 @@ def investigate(
     )
     graph.add_conditional_edges(
         "triage",
-        lambda s: "finalize" if s["status"] in {"budget_exhausted", "no_alert"} else "retrieve",
+        lambda s: (
+            "finalize"
+            if s["status"] in {"budget_exhausted", "no_alert", "insufficient_data"}
+            else "retrieve"
+        ),
     )
     graph.add_conditional_edges(
         "retrieve",

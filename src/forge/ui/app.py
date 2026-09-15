@@ -12,7 +12,7 @@ with st.sidebar:
     st.title("FORGE")
     st.caption("Equipment investigation workspace")
     st.divider()
-    st.markdown("**Current stage**  \nEvaluated ML baseline and evidence workflow")
+    st.markdown("**Current stage**  \nPrecision-focused detector development and evidence workflow")
     st.markdown("**First domain**  \nRecorded pump measurements")
     st.caption("Local analysis · human review · no model API calls")
 
@@ -57,7 +57,7 @@ with environment:
 with data_notes:
     st.subheader("Reading the evidence")
     st.markdown(
-        "1. Eight sensor columns are model inputs; timestamps preserve ordering and gaps.\n2. Anomaly and change-point annotations are source labels, excluded from fitting and investigation evidence.\n3. Training uses normal rows only; validation selects settings; the held-out test measures the frozen detector.\n4. Retrieved notes are project-authored analytical guidance, not manufacturer instructions.\n5. This laboratory benchmark does not establish fault diagnosis, reliability on another machine, or saved downtime."
+        "1. Eight sensor columns supply model features; timestamps preserve ordering and gaps.\n2. Source annotations are excluded from model inputs and investigation evidence. Supervised development uses training anomaly annotations as targets.\n3. The original Isolation Forest fits normal rows only. The precision-focused classifier uses relative and rolling features, with 60 unscored initialization readings.\n4. Validation selects settings. New development results are not an independent test; the original test was already inspected.\n5. Retrieved notes are project-authored analytical guidance, not manufacturer instructions. This laboratory benchmark does not establish fault diagnosis, reliability on another machine, or saved downtime."
     )
     st.write(
         "See `docs/architecture.md`, `docs/evaluation.md`, and `data/README.md` for implementation and provenance."
