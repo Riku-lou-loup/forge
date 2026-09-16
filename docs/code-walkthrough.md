@@ -60,5 +60,21 @@ but its draft status is retained in the filename and content.
 4. Read `tests/test_modeling.py::test_alert_before_event_does_not_count_as_detection`
    and the missing-evidence and budget tests in `tests/test_investigation.py`.
 
-The next modeling decision is an explicit alert-burden objective and a fresh
-evaluation plan, before a PyTorch sequence model or more agents are introduced.
+## Precision-focused continuation
+
+`notebooks/04_precision_comparison.ipynb` shows the development comparison with
+inline confusion matrices. Start with `ml/operating.py::causal_features`: each
+sensor supplies a relative level, one-step change, rolling deviation and rolling
+variation. The first 60 readings establish a reference and are unscored.
+
+Then read `ml/development.py::fit_operating` for deduplication, training targets
+and equal group weighting, followed by `threshold_scan` for the fixed recall
+floors and precision objective. `score_streams` preserves each source file's
+initialization before merging duplicate observations. That boundary matters for
+a model with history.
+
+Finally, `ml/activation.py` checks a local candidate and updates the application's
+active pointer. The original Isolation Forest and benchmark are retained. The
+new classifier is gradient boosting, not PyTorch; neural complexity was not
+needed for this measured improvement. Read `docs/improvement-results.md` for
+remaining misses, false alerts and why a fresh evaluation collection is needed.

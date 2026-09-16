@@ -8,8 +8,9 @@ LangGraph, and Streamlit. It can run without a provider account or API key.
 
 The inventory pins each source recording to a revision and checksum. Loading
 checks numeric values, timestamp order, schema, and metadata. The fixed split
-keeps overlap-connected recordings together. Only normal training rows enter
-fitting; validation chooses the detector and threshold. Explicit test evaluation
+keeps overlap-connected recordings together. The original baseline fits normal
+training rows; supervised development uses training anomaly annotations as targets.
+Validation chooses the detector and threshold. Explicit baseline test evaluation
 is separate from the application and returns the cached result on subsequent calls.
 
 `data/datasets.py` constructs the eight-column feature table and deduplicates
@@ -17,6 +18,15 @@ evaluation groups. `ml/detectors.py` implements the statistical reference and
 Isolation Forest. `ml/metrics.py` applies causal persistence and computes point
 and event metrics. `ml/training.py` saves a local model, configuration, hashes,
 library version, and validation results in a unique run directory.
+
+`ml/operating.py` builds causal relative and rolling features. `ml/development.py`
+compares candidates on development validation, initializing each source recording
+before deduplication to match serving. `ml/activation.py` selects a verified local
+artifact for investigations through `models/active.json`, preserving the original
+baseline pointer. A relative detector needs 60 initialization readings; these
+are explicitly unscored. A recording containing only initialization readings
+returns `insufficient_data` without retrieving guidance. See the
+[precision comparison](improvement-results.md) for the supervised model and limits.
 
 Pickled models are trusted local artifacts created by the training command.
 They must never be supplied as uploads or downloaded from an untrusted source.
@@ -107,8 +117,9 @@ notes are ignored. Source manifests, the small original corpus, configuration,
 aggregate benchmark results, and code remain tracked. The app has no server-side
 account system and is intended for local use.
 
-The next additions are a new modeling protocol focused on alert burden, applicable
-equipment documentation, and a separately evaluated LLM drafting adapter. Computer
+The precision-focused development protocol is implemented. Next evidence includes
+a fresh evaluation collection, applicable equipment documentation, and a separately
+evaluated LLM drafting adapter. Computer
 vision remains optional: nameplate recognition could identify an asset, followed
 by human confirmation before selecting its documentation.
 

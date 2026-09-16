@@ -1,0 +1,1014 @@
+{
+  "schema_version": 2,
+  "sklearn_version": "1.9.1",
+  "prediction_boundary": "Source recording: initialize and compute features before observation deduplication. First inventory occurrence provides prediction context for shared observations.",
+  "run_id": "development-20261007T091715Z-670bcc69",
+  "created_at": "2026-10-07T09:18:01.725443+00:00",
+  "config": {
+    "protocol": "forge-development-v2",
+    "seed": 42,
+    "objective": "User-selected precision priority: fewer alerts even if more anomalies are missed; development validation only.",
+    "minimum_point_recall": 0.6,
+    "minimum_event_recall": 0.6,
+    "minimum_group_point_recall": 0.2,
+    "target_precision": 0.95,
+    "target_false_positive_rate": 0.01,
+    "target_false_alarm_onsets_per_normal_hour": 2.0,
+    "persistence_candidates": [
+      3,
+      5
+    ],
+    "max_gap_seconds": 2,
+    "threshold_quantiles": 101,
+    "reference_readings": 60,
+    "rolling_readings": 20,
+    "extra_trees": {
+      "n_estimators": 256,
+      "min_samples_leaf": 5,
+      "max_features": 1.0,
+      "n_jobs": 2
+    },
+    "candidate_features": [
+      "raw",
+      "causal",
+      "relative"
+    ],
+    "additional_candidates": [
+      "frozen_isolation_forest",
+      "robust_max",
+      "relative_isolation_forest"
+    ],
+    "selection": "Among candidates meeting all recall floors, maximize validation precision, then minimize false onset rate, then maximize point recall; ties prefer earlier candidates. Report target attainment separately. If no candidate meets the floors, retain the old default and report the frontier.",
+    "evaluation_scope": "Previously inspected validation, used for development selection. No new test access; no claim of independent generalization.",
+    "stage": "development-followup-1",
+    "reason": "Initial relative Extra Trees improves precision but leaves sustained false alerts. Compare record-relative scale definitions and a regularized boosted classifier. Selection criteria remain unchanged.",
+    "gradient_boosting": {
+      "max_iter": 200,
+      "max_leaf_nodes": 7,
+      "min_samples_leaf": 30,
+      "l2_regularization": 10.0,
+      "learning_rate": 0.05,
+      "early_stopping": false
+    },
+    "followup_candidates": [
+      {
+        "estimator": "extra_trees",
+        "representation": "relative_noise"
+      },
+      {
+        "estimator": "extra_trees",
+        "representation": "relative_fraction"
+      },
+      {
+        "estimator": "gradient_boosting",
+        "representation": "relative"
+      },
+      {
+        "estimator": "gradient_boosting",
+        "representation": "relative_noise"
+      },
+      {
+        "estimator": "gradient_boosting",
+        "representation": "relative_fraction"
+      },
+      {
+        "estimator": "gradient_boosting",
+        "representation": "causal"
+      }
+    ],
+    "relative_noise_scale": "Maximum of initial-reference scaled MAD, IQR/1.349, and 0.05 times the global training robust scale.",
+    "relative_fraction_scale": "Maximum of the absolute initial-reference median and the global training robust scale.",
+    "scope": "Additional development comparisons informed by the first validation run, not a new holdout."
+  },
+  "config_sha256": "c8ec34ca2b4205143bb8e6f1fe178d3fc67999a9bb78035fc09bc02ee064a8aa",
+  "followup_config_sha256": "b5b083bc63e0ae62d4cb4ff300c882c75a9d2f8b4cc43a056de6723be47435ef",
+  "baseline_run": "20261007T003523Z-e78e7b17",
+  "baseline_model_sha256": "5dc1aa6576af7cefc9fbf41e48c7c725e6b88be88a43bb66a98c05ce598a4d91",
+  "split_sha256": "9bc9f9a6d015dbdc2c74259872a8e7aa3dce81f08c22878bf78c8f8b8cf30042",
+  "inventory_sha256": "275d86b2521b2cf92767c1a0535370c6ce6ab12aa260588758f7bbf3729351f4",
+  "training_audit": {
+    "anomaly-free/anomaly-free": {
+      "raw_rows": 10560,
+      "duplicate_rows": 572,
+      "ambiguous_rows": 0,
+      "unique_rows": 9988
+    },
+    "other/14": {
+      "raw_rows": 905,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 905
+    },
+    "other/6": {
+      "raw_rows": 1147,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1147
+    },
+    "other/9": {
+      "raw_rows": 1144,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1144
+    },
+    "valve1/0": {
+      "raw_rows": 1147,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1147
+    },
+    "valve1/1": {
+      "raw_rows": 1145,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1145
+    },
+    "valve1/2": {
+      "raw_rows": 1075,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1075
+    },
+    "valve1/3": {
+      "raw_rows": 1148,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1148
+    },
+    "valve1/4": {
+      "raw_rows": 1095,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1095
+    },
+    "valve1/5": {
+      "raw_rows": 1154,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1154
+    },
+    "valve1/6": {
+      "raw_rows": 1154,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1154
+    },
+    "valve1/7": {
+      "raw_rows": 1094,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1094
+    },
+    "valve2/0": {
+      "raw_rows": 1125,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1125
+    }
+  },
+  "normal_scaling_audit": {
+    "raw_rows": 23893,
+    "excluded_anomalous_rows": 5015,
+    "duplicate_normal_rows": 572,
+    "training_rows": 18306,
+    "source_catalog_normal_rows": 9405
+  },
+  "validation_audit": {
+    "other/1": {
+      "raw_rows": 745,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 745
+    },
+    "other/10": {
+      "raw_rows": 2517,
+      "duplicate_rows": 21,
+      "ambiguous_rows": 0,
+      "unique_rows": 2496
+    },
+    "other/7": {
+      "raw_rows": 1090,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1090
+    },
+    "valve1/10": {
+      "raw_rows": 1146,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1146
+    },
+    "valve1/11": {
+      "raw_rows": 1141,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1141
+    },
+    "valve1/8": {
+      "raw_rows": 1144,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1144
+    },
+    "valve1/9": {
+      "raw_rows": 1148,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1148
+    },
+    "valve2/1": {
+      "raw_rows": 1063,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1063
+    }
+  },
+  "baseline_validation": {
+    "tp": 3156,
+    "fp": 2193,
+    "fn": 351,
+    "tn": 4273,
+    "precision": 0.5900168255748738,
+    "recall": 0.8999144568006844,
+    "f1": 0.7127371273712737,
+    "fpr_available_normal": 0.33915867615218065,
+    "fpr_all_normal": 0.33915867615218065,
+    "false_alarm_onsets": 201,
+    "false_onsets_per_available_normal_hour": 111.908444169502,
+    "events": 10,
+    "detected_events": 8,
+    "event_recall": 0.8,
+    "minimum_group_recall": 0.7393483709273183,
+    "group_recalls": {
+      "other/1": 1.0,
+      "other/10": 0.95274831243973,
+      "other/7": 0.9913544668587896,
+      "valve1/10": 0.8603491271820449,
+      "valve1/11": 0.7393483709273183,
+      "valve1/8": 0.95,
+      "valve1/9": 0.7935323383084577,
+      "valve2/1": 0.8918918918918919
+    },
+    "available_normal_rows": 6466,
+    "unavailable_rows": 0,
+    "unavailable_anomaly_rows": 0
+  },
+  "candidates": [
+    {
+      "name": "frozen_isolation_forest",
+      "fit_audit": {},
+      "best": {
+        "threshold": 0.5100948295703944,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2930,
+          "fp": 1756,
+          "fn": 577,
+          "tn": 4710,
+          "precision": 0.6252667520273154,
+          "recall": 0.8354719133162247,
+          "f1": 0.7152447211033809,
+          "fpr_available_normal": 0.2715743891122796,
+          "fpr_all_normal": 0.2715743891122796,
+          "false_alarm_onsets": 62,
+          "false_onsets_per_available_normal_hour": 34.519022579647384,
+          "events": 10,
+          "detected_events": 8,
+          "event_recall": 0.8,
+          "minimum_group_recall": 0.6268656716417911,
+          "group_recalls": {
+            "other/1": 1.0,
+            "other/10": 0.940212150433944,
+            "other/7": 0.9855907780979827,
+            "valve1/10": 0.7880299251870324,
+            "valve1/11": 0.7343358395989975,
+            "valve1/8": 0.725,
+            "valve1/9": 0.6268656716417911,
+            "valve2/1": 0.8228228228228228
+          },
+          "available_normal_rows": 6466,
+          "unavailable_rows": 0,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "robust_max",
+      "fit_audit": {},
+      "best": null
+    },
+    {
+      "name": "extra_trees_raw",
+      "fit_audit": {
+        "fit_rows": 23321,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "raw"
+      },
+      "best": null
+    },
+    {
+      "name": "extra_trees_causal",
+      "fit_audit": {
+        "fit_rows": 23321,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "causal"
+      },
+      "best": {
+        "threshold": 0.07628708383154091,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 3238,
+          "fp": 3550,
+          "fn": 269,
+          "tn": 2916,
+          "precision": 0.47701826753093696,
+          "recall": 0.9232962646136299,
+          "f1": 0.62904322486644,
+          "fpr_available_normal": 0.549025672749768,
+          "fpr_all_normal": 0.549025672749768,
+          "false_alarm_onsets": 89,
+          "false_onsets_per_available_normal_hour": 49.551500154655116,
+          "events": 10,
+          "detected_events": 7,
+          "event_recall": 0.7,
+          "minimum_group_recall": 0.26063829787234044,
+          "group_recalls": {
+            "other/1": 0.26063829787234044,
+            "other/10": 0.9652844744455159,
+            "other/7": 0.9855907780979827,
+            "valve1/10": 1.0,
+            "valve1/11": 0.8571428571428571,
+            "valve1/8": 1.0,
+            "valve1/9": 1.0,
+            "valve2/1": 0.9039039039039038
+          },
+          "available_normal_rows": 6466,
+          "unavailable_rows": 0,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "extra_trees_relative",
+      "fit_audit": {
+        "fit_rows": 22541,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative"
+      },
+      "best": {
+        "threshold": 0.17039422645152943,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2375,
+          "fp": 688,
+          "fn": 1132,
+          "tn": 5778,
+          "precision": 0.7753836108390467,
+          "recall": 0.677216994582264,
+          "f1": 0.7229832572298326,
+          "fpr_available_normal": 0.11568858247856062,
+          "fpr_all_normal": 0.10640272193009588,
+          "false_alarm_onsets": 27,
+          "false_onsets_per_available_normal_hour": 16.344375315285017,
+          "events": 10,
+          "detected_events": 10,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.20540019286403086,
+          "group_recalls": {
+            "other/1": 0.8351063829787234,
+            "other/10": 0.20540019286403086,
+            "other/7": 0.9855907780979827,
+            "valve1/10": 0.8403990024937655,
+            "valve1/11": 0.7769423558897243,
+            "valve1/8": 0.9825,
+            "valve1/9": 0.8631840796019901,
+            "valve2/1": 0.8288288288288288
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "isolation_forest_relative",
+      "fit_audit": {
+        "fit_rows": 17526,
+        "positive_training_targets": 0,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative"
+      },
+      "best": {
+        "threshold": 0.36449237389154604,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2501,
+          "fp": 3223,
+          "fn": 1006,
+          "tn": 3243,
+          "precision": 0.43693221523410203,
+          "recall": 0.7131451382948389,
+          "f1": 0.5418697865886686,
+          "fpr_available_normal": 0.5419539263494199,
+          "fpr_all_normal": 0.4984534488091556,
+          "false_alarm_onsets": 120,
+          "false_onsets_per_available_normal_hour": 72.64166806793341,
+          "events": 10,
+          "detected_events": 7,
+          "event_recall": 0.7,
+          "minimum_group_recall": 0.275,
+          "group_recalls": {
+            "other/1": 0.973404255319149,
+            "other/10": 1.0,
+            "other/7": 1.0,
+            "valve1/10": 0.5037406483790524,
+            "valve1/11": 0.40852130325814534,
+            "valve1/8": 0.275,
+            "valve1/9": 0.7238805970149254,
+            "valve2/1": 0.5045045045045045
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "extra_trees_relative_noise",
+      "fit_audit": {
+        "fit_rows": 22541,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative_noise"
+      },
+      "best": {
+        "threshold": 0.14080876394367176,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2447,
+          "fp": 906,
+          "fn": 1060,
+          "tn": 5560,
+          "precision": 0.7297942141365941,
+          "recall": 0.6977473624180212,
+          "f1": 0.7134110787172012,
+          "fpr_available_normal": 0.15234572053136036,
+          "fpr_all_normal": 0.14011753789050418,
+          "false_alarm_onsets": 49,
+          "false_onsets_per_available_normal_hour": 29.66201446107281,
+          "events": 10,
+          "detected_events": 10,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.21407907425265188,
+          "group_recalls": {
+            "other/1": 0.8563829787234043,
+            "other/10": 0.21407907425265188,
+            "other/7": 0.9855907780979827,
+            "valve1/10": 0.9077306733167082,
+            "valve1/11": 0.7919799498746867,
+            "valve1/8": 0.985,
+            "valve1/9": 0.8706467661691543,
+            "valve2/1": 0.8948948948948949
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "extra_trees_relative_fraction",
+      "fit_audit": {
+        "fit_rows": 22541,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative_fraction"
+      },
+      "best": {
+        "threshold": 0.11403685656155203,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2459,
+          "fp": 878,
+          "fn": 1048,
+          "tn": 5588,
+          "precision": 0.7368894216362002,
+          "recall": 0.7011690903906472,
+          "f1": 0.7185856224430158,
+          "fpr_available_normal": 0.147637464267698,
+          "fpr_all_normal": 0.1357871945561398,
+          "false_alarm_onsets": 39,
+          "false_onsets_per_available_normal_hour": 23.608542122078358,
+          "events": 10,
+          "detected_events": 10,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.21793635486981677,
+          "group_recalls": {
+            "other/1": 0.8404255319148937,
+            "other/10": 0.21793635486981677,
+            "other/7": 0.9855907780979827,
+            "valve1/10": 0.8728179551122195,
+            "valve1/11": 0.7819548872180451,
+            "valve1/8": 0.9825,
+            "valve1/9": 0.9129353233830846,
+            "valve2/1": 0.933933933933934
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "gradient_boosting_relative",
+      "fit_audit": {
+        "fit_rows": 22541,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative"
+      },
+      "best": {
+        "threshold": 0.19899640796797832,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2309,
+          "fp": 118,
+          "fn": 1198,
+          "tn": 6348,
+          "precision": 0.9513803049031726,
+          "recall": 0.6583974907328201,
+          "f1": 0.778227165487024,
+          "fpr_available_normal": 0.01984193711114848,
+          "fpr_all_normal": 0.01824930405196412,
+          "false_alarm_onsets": 26,
+          "false_onsets_per_available_normal_hour": 15.739028081385573,
+          "events": 10,
+          "detected_events": 10,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.21697203471552556,
+          "group_recalls": {
+            "other/1": 0.7074468085106383,
+            "other/10": 0.21697203471552556,
+            "other/7": 0.9855907780979827,
+            "valve1/10": 0.7880299251870324,
+            "valve1/11": 0.7418546365914787,
+            "valve1/8": 0.9825,
+            "valve1/9": 0.8407960199004975,
+            "valve2/1": 0.7987987987987988
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "gradient_boosting_relative_noise",
+      "fit_audit": {
+        "fit_rows": 22541,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative_noise"
+      },
+      "best": {
+        "threshold": 0.04634855006460475,
+        "policy": {
+          "persistence": 3,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2480,
+          "fp": 1935,
+          "fn": 1027,
+          "tn": 4531,
+          "precision": 0.5617214043035108,
+          "recall": 0.7071571143427431,
+          "f1": 0.6261045190608432,
+          "fpr_available_normal": 0.32537413822095174,
+          "fpr_all_normal": 0.29925765542839466,
+          "false_alarm_onsets": 206,
+          "false_onsets_per_available_normal_hour": 124.7015301832857,
+          "events": 10,
+          "detected_events": 10,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.20250723240115717,
+          "group_recalls": {
+            "other/1": 0.9308510638297872,
+            "other/10": 0.20250723240115717,
+            "other/7": 0.9913544668587896,
+            "valve1/10": 0.9152119700748129,
+            "valve1/11": 0.7794486215538847,
+            "valve1/8": 0.99,
+            "valve1/9": 0.917910447761194,
+            "valve2/1": 0.924924924924925
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "gradient_boosting_relative_fraction",
+      "fit_audit": {
+        "fit_rows": 22541,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative_fraction"
+      },
+      "best": {
+        "threshold": 0.0507474358360539,
+        "policy": {
+          "persistence": 5,
+          "max_gap_seconds": 2
+        },
+        "metrics": {
+          "tp": 2429,
+          "fp": 1009,
+          "fn": 1078,
+          "tn": 5457,
+          "precision": 0.7065154159394997,
+          "recall": 0.6926147704590818,
+          "f1": 0.6994960403167747,
+          "fpr_available_normal": 0.16966537750126115,
+          "fpr_all_normal": 0.15604701515620167,
+          "false_alarm_onsets": 89,
+          "false_onsets_per_available_normal_hour": 53.87590381705061,
+          "events": 10,
+          "detected_events": 10,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.2073288331726133,
+          "group_recalls": {
+            "other/1": 0.723404255319149,
+            "other/10": 0.2073288331726133,
+            "other/7": 0.9971181556195965,
+            "valve1/10": 0.9077306733167082,
+            "valve1/11": 0.7719298245614035,
+            "valve1/8": 0.9825,
+            "valve1/9": 0.917910447761194,
+            "valve2/1": 0.8948948948948949
+          },
+          "available_normal_rows": 5947,
+          "unavailable_rows": 519,
+          "unavailable_anomaly_rows": 0
+        },
+        "feasible": true
+      }
+    },
+    {
+      "name": "gradient_boosting_causal",
+      "fit_audit": {
+        "fit_rows": 23321,
+        "positive_training_targets": 5015,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "causal"
+      },
+      "best": null
+    }
+  ],
+  "selected": {
+    "name": "gradient_boosting_relative",
+    "threshold": 0.19899640796797832,
+    "policy": {
+      "persistence": 5,
+      "max_gap_seconds": 2
+    },
+    "metrics": {
+      "tp": 2309,
+      "fp": 118,
+      "fn": 1198,
+      "tn": 6348,
+      "precision": 0.9513803049031726,
+      "recall": 0.6583974907328201,
+      "f1": 0.778227165487024,
+      "fpr_available_normal": 0.01984193711114848,
+      "fpr_all_normal": 0.01824930405196412,
+      "false_alarm_onsets": 26,
+      "false_onsets_per_available_normal_hour": 15.739028081385573,
+      "events": 10,
+      "detected_events": 10,
+      "event_recall": 1.0,
+      "minimum_group_recall": 0.21697203471552556,
+      "group_recalls": {
+        "other/1": 0.7074468085106383,
+        "other/10": 0.21697203471552556,
+        "other/7": 0.9855907780979827,
+        "valve1/10": 0.7880299251870324,
+        "valve1/11": 0.7418546365914787,
+        "valve1/8": 0.9825,
+        "valve1/9": 0.8407960199004975,
+        "valve2/1": 0.7987987987987988
+      },
+      "available_normal_rows": 5947,
+      "unavailable_rows": 519,
+      "unavailable_anomaly_rows": 0
+    },
+    "feasible": true,
+    "descriptor": {
+      "name": "gradient_boosting_relative",
+      "features": [
+        "Accelerometer1RMS",
+        "Accelerometer2RMS",
+        "Current",
+        "Pressure",
+        "Temperature",
+        "Thermocouple",
+        "Voltage",
+        "Volume Flow RateRMS"
+      ],
+      "center": [
+        0.210522,
+        0.26488849999999997,
+        2.050195,
+        0.054711,
+        88.67609999999999,
+        28.0019,
+        229.514,
+        124.333
+      ],
+      "scale": [
+        0.012009060000000035,
+        0.012573930600000024,
+        1.057323603,
+        0.24308895478131948,
+        2.1831285000000054,
+        1.9726734300000008,
+        9.074253299999988,
+        3.9540942000000023
+      ],
+      "scale_methods": [
+        "MAD",
+        "MAD",
+        "MAD",
+        "IQR",
+        "MAD",
+        "MAD",
+        "MAD",
+        "MAD"
+      ],
+      "score_direction": "larger means more anomaly-like; not a calibrated physical failure probability",
+      "family": "HistGradientBoostingClassifier",
+      "representation": "relative",
+      "input_sensor_columns": [
+        "Accelerometer1RMS",
+        "Accelerometer2RMS",
+        "Current",
+        "Pressure",
+        "Temperature",
+        "Thermocouple",
+        "Voltage",
+        "Volume Flow RateRMS"
+      ],
+      "derived_features": 32,
+      "reference_readings": 60,
+      "rolling_readings": 20,
+      "initialization_requirement": "First reference readings must represent an appropriate operating reference; startup faults may be missed."
+    },
+    "model_sha256": "4f05931ad8e84981e95b97ae346ec902c354dbe425e8b2ac0574ca9445d863ad",
+    "full_validation_metrics": {
+      "pooled": {
+        "rows": 9973,
+        "positive_rows": 3507,
+        "tp": 2309,
+        "fp": 118,
+        "fn": 1198,
+        "tn": 6348,
+        "events": 10,
+        "detected_events": 10,
+        "false_alarm_onsets": 26,
+        "normal_hours": 1.7961111111111112,
+        "precision": 0.9513803049031726,
+        "recall": 0.6583974907328201,
+        "f1": 0.778227165487024,
+        "event_recall": 1.0,
+        "false_alarms_per_normal_hour": 14.475719146303742,
+        "average_precision": 0.8850326856686995,
+        "macro_group_average_precision": 0.8909489310268759,
+        "median_detected_event_delay_seconds": 41.5
+      },
+      "per_group": {
+        "other/1": {
+          "rows": 745,
+          "positive_rows": 188,
+          "tp": 133,
+          "fp": 7,
+          "fn": 55,
+          "tn": 550,
+          "precision": 0.95,
+          "recall": 0.7074468085106383,
+          "f1": 0.8109756097560976,
+          "average_precision": 0.7309586450493898,
+          "roc_auc": 0.8145555597998396,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            53.0
+          ],
+          "false_alarm_onsets": 4,
+          "normal_hours": 0.15472222222222223,
+          "false_alarms_per_normal_hour": 25.852782764811487
+        },
+        "other/10": {
+          "rows": 2496,
+          "positive_rows": 1037,
+          "tp": 225,
+          "fp": 28,
+          "fn": 812,
+          "tn": 1431,
+          "precision": 0.8893280632411067,
+          "recall": 0.21697203471552556,
+          "f1": 0.3488372093023256,
+          "average_precision": 0.7382107636742103,
+          "roc_auc": 0.7775857362574464,
+          "events": 2,
+          "detected_events": 2,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            138.0,
+            10.0
+          ],
+          "false_alarm_onsets": 8,
+          "normal_hours": 0.4052777777777778,
+          "false_alarms_per_normal_hour": 19.739547635366687
+        },
+        "other/7": {
+          "rows": 1090,
+          "positive_rows": 347,
+          "tp": 342,
+          "fp": 47,
+          "fn": 5,
+          "tn": 696,
+          "precision": 0.8791773778920309,
+          "recall": 0.9855907780979827,
+          "f1": 0.9293478260869565,
+          "average_precision": 0.9975316103971362,
+          "roc_auc": 0.9986036823998046,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            5.0
+          ],
+          "false_alarm_onsets": 7,
+          "normal_hours": 0.2063888888888889,
+          "false_alarms_per_normal_hour": 33.91655450874831
+        },
+        "valve1/10": {
+          "rows": 1146,
+          "positive_rows": 401,
+          "tp": 316,
+          "fp": 34,
+          "fn": 85,
+          "tn": 711,
+          "precision": 0.9028571428571428,
+          "recall": 0.7880299251870324,
+          "f1": 0.8415446071904128,
+          "average_precision": 0.9085398100326313,
+          "roc_auc": 0.9017004468694036,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            64.0
+          ],
+          "false_alarm_onsets": 7,
+          "normal_hours": 0.20694444444444443,
+          "false_alarms_per_normal_hour": 33.8255033557047
+        },
+        "valve1/11": {
+          "rows": 1141,
+          "positive_rows": 399,
+          "tp": 296,
+          "fp": 0,
+          "fn": 103,
+          "tn": 742,
+          "precision": 1.0,
+          "recall": 0.7418546365914787,
+          "f1": 0.8517985611510791,
+          "average_precision": 0.8673272138215863,
+          "roc_auc": 0.8323048186503996,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            58.0
+          ],
+          "false_alarm_onsets": 0,
+          "normal_hours": 0.2061111111111111,
+          "false_alarms_per_normal_hour": 0.0
+        },
+        "valve1/8": {
+          "rows": 1144,
+          "positive_rows": 400,
+          "tp": 393,
+          "fp": 2,
+          "fn": 7,
+          "tn": 742,
+          "precision": 0.9949367088607595,
+          "recall": 0.9825,
+          "f1": 0.9886792452830189,
+          "average_precision": 0.9934011898454657,
+          "roc_auc": 0.9966498655913979,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            8.0
+          ],
+          "false_alarm_onsets": 0,
+          "normal_hours": 0.20666666666666667,
+          "false_alarms_per_normal_hour": 0.0
+        },
+        "valve1/9": {
+          "rows": 1148,
+          "positive_rows": 402,
+          "tp": 338,
+          "fp": 0,
+          "fn": 64,
+          "tn": 746,
+          "precision": 1.0,
+          "recall": 0.8407960199004975,
+          "f1": 0.9135135135135135,
+          "average_precision": 0.9461055239137491,
+          "roc_auc": 0.9397916583303323,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            40.0
+          ],
+          "false_alarm_onsets": 0,
+          "normal_hours": 0.20722222222222222,
+          "false_alarms_per_normal_hour": 0.0
+        },
+        "valve2/1": {
+          "rows": 1063,
+          "positive_rows": 333,
+          "tp": 266,
+          "fp": 0,
+          "fn": 67,
+          "tn": 730,
+          "precision": 1.0,
+          "recall": 0.7987987987987988,
+          "f1": 0.8881469115191987,
+          "average_precision": 0.9455166914808381,
+          "roc_auc": 0.9546546546546547,
+          "events": 2,
+          "detected_events": 2,
+          "event_recall": 1.0,
+          "detected_event_delays_seconds": [
+            43.0,
+            4.0
+          ],
+          "false_alarm_onsets": 0,
+          "normal_hours": 0.20277777777777778,
+          "false_alarms_per_normal_hour": 0.0
+        }
+      }
+    },
+    "coverage_note": "Startup unavailable readings count as missed anomalies in recall. FPR and false onset exposure use available normal observations. Full confusion metrics retain suppressed startup readings; inspect availability counts."
+  },
+  "scope": "Development validation selection; not independent held-out performance. No new test scoring.",
+  "comparison_runs": [
+    "development-20261007T091229Z-654e15f7",
+    "development-20261007T091715Z-670bcc69"
+  ],
+  "targets_met": {
+    "precision_at_least_95_percent": true,
+    "available_normal_fpr_at_most_1_percent": false,
+    "false_onsets_at_most_2_per_available_normal_hour": false
+  }
+}

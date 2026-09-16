@@ -7,7 +7,13 @@ detector finds a persistent anomaly, a bounded workflow retrieves relevant
 analytical guidance, and a reviewer can inspect the citations and export the result.
 The application uses real measurements from the Skoltech Anomaly Benchmark (SKAB).
 
-The first frozen detector reached **0.616 F1** and detected **18 of 23 events** on
+The precision-focused development detector reaches **95.1% precision** at
+**65.8% recall**, reducing false-positive readings from 2,193 to 118 on validation.
+It uses gradient-boosted trees and changes relative to each recording's initial
+reference. These are selection results, not independent test performance; see the
+[comparison and remaining limitations](docs/improvement-results.md).
+
+The original frozen Isolation Forest reached **0.616 F1** and detected **18 of 23 events** on
 held-out recordings. Its **145.4 false alert onsets per normal hour** make it a
 research baseline, not a deployment-ready warning system. The
 [evaluation report](docs/evaluation.md) explains the comparison and limitations.
@@ -20,7 +26,9 @@ equipment-specific documentation remain future work.
 
 - Validate pinned source files and keep overlapping recordings in the same split.
 - Train on 18,306 unique normal observations, select on validation, and evaluate
-  a frozen model on explicitly enabled test data.
+  the original baseline on explicitly enabled test data.
+- Compare supervised causal detectors on development data and activate a
+  precision-focused model with an explicit 60-reading initialization requirement.
 - Inspect sensor traces, anomaly scores, and causal persistent alerts in Streamlit.
 - Retrieve versioned passages using TF-IDF and verify copied checks against citations.
 - Trace the LangGraph workflow, including abstention and exhausted-budget outcomes.
@@ -45,6 +53,8 @@ python -m venv .venv
 ```
 
 Open [the local application](http://127.0.0.1:8511). Stop it with Ctrl+C.
+The quick start creates the original baseline. To reproduce and activate the
+precision-focused model, follow [the development comparison](docs/improvement-results.md#reproduce-and-inspect).
 After setup, `start.cmd` also launches the app. Use `-m forge app --port 8512`
 if the default port is occupied. Always use the repository's `.venv` interpreter.
 
@@ -137,8 +147,10 @@ reference. See [data notes](data/README.md) for sensor and sampling details.
 
 SKAB contains laboratory measurements. Results on this data do not establish
 factory reliability, exact fault diagnosis, remaining useful life, or saved downtime.
-Anomaly and change-point labels are evaluation annotations and are excluded from
-model inputs. Source attribution remains part of the public repository.
+Anomaly and change-point labels are source annotations and are excluded from
+model inputs. Supervised development uses training anomaly annotations as targets;
+the original baseline fits normal examples only. Source attribution remains part
+of the public repository.
 
 ## License and commercial use
 
