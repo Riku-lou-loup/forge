@@ -1,0 +1,32 @@
+{
+  "protocol": "forge-nested-group-development-v1",
+  "scope": "Retrospective development audit over original train and validation recordings only. Previously inspected data and informed model family choices; not a fresh holdout or a future-time/unseen-machine benchmark.",
+  "seed": 42,
+  "outer_folds": 5,
+  "inner_folds": 3,
+  "splitter": "GroupKFold with shuffle=True, random_state=42; whole overlap groups, not individual readings. Same seed for every inner split.",
+  "reference_readings": 60,
+  "rolling_readings": 20,
+  "max_gap_seconds": 2,
+  "persistence_candidates": [3, 5],
+  "threshold_quantiles": 101,
+  "minimum_point_recall": 0.6,
+  "minimum_event_recall": 0.6,
+  "minimum_group_point_recall": 0.2,
+  "target_precision": 0.95,
+  "target_false_positive_rate": 0.01,
+  "target_false_alarm_onsets_per_normal_hour": 2.0,
+  "selection": "Select hyperparameters, threshold and persistence on pooled inner out-of-fold predictions only. Among recall-feasible points maximize precision, then minimize false-onset frequency, then maximize recall. Keep the first candidate on an exact tie.",
+  "infeasible_fallback": "If no point satisfies all recall floors, maximize the minimum capped ratio of achieved recall to each required recall floor, then precision, then minimize false-onset frequency, then recall. Disclose infeasibility. Do not change constraints or discard the outer fold.",
+  "reference_candidate": "current_hgb",
+  "candidates": [
+    {"id": "current_hgb", "max_iter": 200, "max_leaf_nodes": 7, "min_samples_leaf": 30, "l2_regularization": 10.0, "learning_rate": 0.05, "early_stopping": false},
+    {"id": "shallow_hgb", "max_iter": 200, "max_leaf_nodes": 3, "min_samples_leaf": 60, "l2_regularization": 25.0, "learning_rate": 0.05, "early_stopping": false},
+    {"id": "regularized_hgb", "max_iter": 300, "max_leaf_nodes": 7, "min_samples_leaf": 60, "l2_regularization": 25.0, "learning_rate": 0.03, "early_stopping": false},
+    {"id": "larger_hgb", "max_iter": 200, "max_leaf_nodes": 15, "min_samples_leaf": 30, "l2_regularization": 10.0, "learning_rate": 0.05, "early_stopping": false}
+  ],
+  "isolation_forest": {"n_estimators": 256, "max_samples": 1024},
+  "threads": 2,
+  "final_refit": "After nested assessment, select a candidate and alert settings using five-fold grouped out-of-fold scores across the full development pool, then refit on the pool. Save an audit artifact; do not activate it. Its selection scores are not independent performance.",
+  "reporting": "Pooled confusion counts, precision/recall, available-normal FPR/exposure, false onsets, event recall/delay, macro group precision, fold ranges, matched per-group deltas, inner feasibility and training-versus-outer gaps. No point adjustment. No new access to old test CSVs."
+}
