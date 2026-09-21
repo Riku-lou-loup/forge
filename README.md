@@ -13,6 +13,12 @@ It uses gradient-boosted trees and changes relative to each recording's initial
 reference. These are selection results, not independent test performance; see the
 [comparison and remaining limitations](docs/improvement-results.md).
 
+The [grouped generalization audit](docs/generalization-results.md) refits detectors
+across excluded recording groups and compares the current configuration with a
+fixed hyperparameter search. Read it alongside the original precision figure:
+that figure came from model selection on one validation allocation and does not
+establish consistent performance across operating conditions.
+
 The original frozen Isolation Forest reached **0.616 F1** and detected **18 of 23 events** on
 held-out recordings. Its **145.4 false alert onsets per normal hour** make it a
 research baseline, not a deployment-ready warning system. The
@@ -29,6 +35,8 @@ equipment-specific documentation remain future work.
   the original baseline on explicitly enabled test data.
 - Compare supervised causal detectors on development data and activate a
   precision-focused model with an explicit 60-reading initialization requirement.
+- Audit the current configuration and tuned variants with nested grouped
+  cross-validation, keeping excluded groups out of fitting and threshold selection.
 - Inspect sensor traces, anomaly scores, and causal persistent alerts in Streamlit.
 - Retrieve versioned passages using TF-IDF and verify copied checks against citations.
 - Trace the LangGraph workflow, including abstention and exhausted-budget outcomes.
