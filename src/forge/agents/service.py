@@ -26,11 +26,13 @@ def load_development_recording(experiment_id, root=PROJECT_ROOT):
     return inspect_recording(record, root), record
 
 
-def investigate_recording(experiment_id="valve1/1", *, root=PROJECT_ROOT, budget=Budget()):
+def investigate_recording(
+    experiment_id="valve1/1", *, root=PROJECT_ROOT, budget=Budget(), retrieval_backend="tfidf"
+):
     detector, metadata, _ = load_model(root, active=True)
     frame, record = load_development_recording(experiment_id, root)
     path = root / "knowledge/playbook.json"
-    retriever = Retriever(path) if path.exists() else None
+    retriever = Retriever(path, backend=retrieval_backend) if path.exists() else None
     return investigate(
         frame,
         detector,
