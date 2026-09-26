@@ -9,6 +9,11 @@ import pytest
 from forge.data.datasets import FEATURES
 
 
+@pytest.fixture
+def torch_runtime():
+    return pytest.importorskip("torch", reason="Requires the optional PyTorch dependency.")
+
+
 def recording(n=12, *, start="2024-01-01", offset=0, group="g"):
     frame = pd.DataFrame(
         {name: np.arange(n, dtype=float) + offset + i for i, name in enumerate(FEATURES)}
@@ -120,6 +125,7 @@ def tiny_fit():
     return module.fit_detector({"source": frame}, normal, tiny_config())
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_fit_is_deterministic_and_scaler_uses_supplied_training_normals_only():
     first, history, audit = tiny_fit()
     second, other_history, _ = tiny_fit()
@@ -136,6 +142,7 @@ def test_fit_is_deterministic_and_scaler_uses_supplied_training_normals_only():
     assert first.describe()["features"] == FEATURES
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_adapter_is_causal_annotation_independent_and_readiness_aware():
     detector, _, _ = tiny_fit()
     frame = recording(80)
@@ -166,6 +173,7 @@ def pinned_provenance(root):
     return {"manifests": {name: digest(root / name) for name in names}}
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_artifact_roundtrip_scores_and_tamper_rejection(tmp_path):
     import json
 
@@ -195,6 +203,7 @@ def test_artifact_roundtrip_scores_and_tamper_rejection(tmp_path):
         artifacts.load_torch_artifact(folder, root=tmp_path)
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_loader_rejects_wrong_state_shape_even_with_updated_hash(tmp_path):
     import json
 
@@ -231,6 +240,7 @@ def test_loader_rejects_wrong_state_shape_even_with_updated_hash(tmp_path):
         artifacts.load_torch_artifact(folder, root=tmp_path)
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_precision_first_threshold_requires_recall_and_reports_fallback():
     training = importlib.import_module("forge.ml.torch_training")
     frame = recording(10)
@@ -250,6 +260,7 @@ def test_precision_first_threshold_requires_recall_and_reports_fallback():
     assert len(scan) > 1
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_training_never_fits_validation_and_preserves_pointers(tmp_path, monkeypatch):
     import json
     from pathlib import Path
@@ -298,6 +309,7 @@ def test_training_never_fits_validation_and_preserves_pointers(tmp_path, monkeyp
         assert (tmp_path / "models" / name).read_text() == "preserve-me"
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_loaded_detector_runs_existing_investigation(tmp_path):
     from forge.agents.workflow import investigate
 
@@ -321,6 +333,7 @@ def test_loaded_detector_runs_existing_investigation(tmp_path):
     assert report.observation["scored_rows"] == 0
 
 
+@pytest.mark.usefixtures("torch_runtime")
 def test_module_cli_reloads_and_investigates_with_existing_retriever(tmp_path, monkeypatch, capsys):
     import json
     import sys
@@ -383,6 +396,7 @@ def test_windows_reject_explicitly_mixed_source_recordings():
         "wrong_features",
     ],
 )
+@pytest.mark.usefixtures("torch_runtime")
 def test_loader_rejects_incomplete_provenance_or_descriptor_after_rehash(tmp_path, mutation):
     import json
 
