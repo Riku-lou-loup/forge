@@ -152,6 +152,20 @@ def test_adapter_is_causal_annotation_independent_and_readiness_aware():
     )
 
 
+def pinned_provenance(root):
+    from pathlib import Path
+
+    from forge.ml.training import digest
+
+    repo = Path(__file__).resolve().parents[1]
+    names = ("data/skab-inventory.json", "data/skab-splits.json")
+    for name in names:
+        destination = root / name
+        destination.parent.mkdir(exist_ok=True)
+        destination.write_bytes((repo / name).read_bytes())
+    return {"manifests": {name: digest(root / name) for name in names}}
+
+
 def test_artifact_roundtrip_scores_and_tamper_rejection(tmp_path):
     import json
 
@@ -162,7 +176,7 @@ def test_artifact_roundtrip_scores_and_tamper_rejection(tmp_path):
         "threshold": 0.5,
         "policy": {"persistence": 1, "max_gap_seconds": 2},
         "training_audit": audit,
-        "provenance": {},
+        "provenance": pinned_provenance(tmp_path),
     }
     folder = tmp_path / "run"
     artifacts.save_torch_artifact(folder, detector, metadata, history)
@@ -198,7 +212,7 @@ def test_loader_rejects_wrong_state_shape_even_with_updated_hash(tmp_path):
             "run_id": "tiny",
             "threshold": 0.5,
             "policy": {"persistence": 1, "max_gap_seconds": 2},
-            "provenance": {},
+            "provenance": pinned_provenance(tmp_path),
         },
         history,
     )
@@ -297,7 +311,7 @@ def test_loaded_detector_runs_existing_investigation(tmp_path):
             "run_id": "tiny",
             "threshold": 0.99,
             "policy": {"persistence": 1, "max_gap_seconds": 2},
-            "provenance": {},
+            "provenance": pinned_provenance(tmp_path),
         },
         history,
     )
@@ -323,7 +337,7 @@ def test_module_cli_reloads_and_investigates_with_existing_retriever(tmp_path, m
             "run_id": "tiny",
             "threshold": 0.1,
             "policy": {"persistence": 1, "max_gap_seconds": 2},
-            "provenance": {},
+            "provenance": pinned_provenance(tmp_path),
         },
         history,
     )
@@ -354,3 +368,60 @@ def test_windows_reject_explicitly_mixed_source_recordings():
     frame["experiment_id"] = ["a"] * 6 + ["b"] * 6
     with pytest.raises(ValueError, match="source recording"):
         data_module().causal_windows(frame, np.zeros(8), np.ones(8), window=4)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing_provenance",
+        "empty_provenance",
+        "empty_manifests",
+        "partial_manifests",
+        "extra_manifest",
+        "wrong_name",
+        "wrong_window",
+        "wrong_features",
+    ],
+)
+def test_loader_rejects_incomplete_provenance_or_descriptor_after_rehash(tmp_path, mutation):
+    import json
+
+    from forge.ml.training import digest, write_json
+
+    artifacts = importlib.import_module("forge.ml.torch_artifacts")
+    detector, history, _ = tiny_fit()
+    folder = tmp_path / "run"
+    artifacts.save_torch_artifact(
+        folder,
+        detector,
+        {
+            "run_id": "tiny",
+            "threshold": 0.5,
+            "policy": {"persistence": 1, "max_gap_seconds": 2},
+            "provenance": pinned_provenance(tmp_path),
+        },
+        history,
+    )
+    metadata = json.loads((folder / "metadata.json").read_text())
+    if mutation == "missing_provenance":
+        del metadata["provenance"]
+    elif mutation == "empty_provenance":
+        metadata["provenance"] = {}
+    elif mutation == "empty_manifests":
+        metadata["provenance"]["manifests"] = {}
+    elif mutation == "partial_manifests":
+        del metadata["provenance"]["manifests"]["data/skab-splits.json"]
+    elif mutation == "extra_manifest":
+        metadata["provenance"]["manifests"]["unexpected.json"] = "irrelevant"
+    elif mutation == "wrong_name":
+        metadata["detector"]["name"] = "other_detector"
+    elif mutation == "wrong_window":
+        metadata["detector"]["window"] += 1
+    else:
+        metadata["detector"]["features"] = list(reversed(FEATURES))
+    write_json(folder / "metadata.json", metadata)
+    manifest = json.loads((folder / "checksums.json").read_text())
+    manifest["metadata.json"] = digest(folder / "metadata.json")
+    write_json(folder / "checksums.json", manifest)
+    with pytest.raises(ValueError, match="provenance|configuration"):
+        artifacts.load_torch_artifact(folder, root=tmp_path)

@@ -66,9 +66,16 @@ def load_torch_artifact(folder, root=PROJECT_ROOT):
         raise ValueError("Inconsistent artifact configuration or metadata.")
     if metadata["torch_version"] != str(torch.__version__):
         raise ValueError("Artifact requires the recorded PyTorch version.")
-    for name, checksum in metadata.get("provenance", {}).get("manifests", {}).items():
-        if name not in {"data/skab-splits.json", "data/skab-inventory.json"}:
-            raise ValueError("Unexpected provenance manifest path.")
+    provenance = metadata.get("provenance")
+    if not isinstance(provenance, dict):
+        raise ValueError("Missing artifact provenance.")
+    manifests = provenance.get("manifests")
+    if not isinstance(manifests, dict) or set(manifests) != {
+        "data/skab-splits.json",
+        "data/skab-inventory.json",
+    }:
+        raise ValueError("Artifact provenance requires exactly the pinned split and inventory.")
+    for name, checksum in manifests.items():
         if digest(root / name) != checksum:
             raise ValueError(f"Training provenance changed: {name}.")
     descriptor = metadata["detector"]
