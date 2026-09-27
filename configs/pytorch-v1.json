@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "seed": 42,
+  "window": 32,
+  "channels": 16,
+  "kernel_size": 5,
+  "epochs": 8,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "cpu_threads": 2,
+  "persistence": 3,
+  "max_gap_seconds": 2,
+  "minimum_recall": 0.3,
+  "threshold_quantiles": 201
+}
