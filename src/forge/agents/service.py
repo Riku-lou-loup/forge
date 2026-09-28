@@ -1,5 +1,7 @@
 """Application boundary: trusted model, pinned recordings, local evidence only."""
 
+from pathlib import Path
+
 from forge.agents.workflow import Budget, investigate
 from forge.config import PROJECT_ROOT
 from forge.data.partitions import inspect_recording, read_plan, select_records
@@ -27,9 +29,30 @@ def load_development_recording(experiment_id, root=PROJECT_ROOT):
 
 
 def investigate_recording(
-    experiment_id="valve1/1", *, root=PROJECT_ROOT, budget=Budget(), retrieval_backend="tfidf"
+    experiment_id="valve1/1",
+    *,
+    root=PROJECT_ROOT,
+    budget=Budget(),
+    retrieval_backend="tfidf",
+    torch_artifact=None,
 ):
-    detector, metadata, _ = load_model(root, active=True)
+    root = Path(root)
+    if torch_artifact is None:
+        detector, metadata, _ = load_model(root, active=True)
+    else:
+        try:
+            from forge.ml.torch_artifacts import load_torch_artifact
+        except ModuleNotFoundError as error:
+            if error.name != "torch":
+                raise
+            raise ValueError(
+                "The research detector requires PyTorch. Install requirements-torch.txt "
+                "in the project environment first."
+            ) from error
+        artifact = Path(torch_artifact)
+        if not artifact.is_absolute():
+            artifact = root / artifact
+        detector, metadata = load_torch_artifact(artifact, root=root)
     frame, record = load_development_recording(experiment_id, root)
     path = root / "knowledge/playbook.json"
     retriever = Retriever(path, backend=retrieval_backend) if path.exists() else None

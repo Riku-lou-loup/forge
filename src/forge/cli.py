@@ -58,6 +58,17 @@ def main() -> int:
     investigation.add_argument(
         "--export", action="store_true", help="Save an unreviewed JSON and Markdown draft"
     )
+    investigation.add_argument(
+        "--retriever",
+        choices=("tfidf", "bm25"),
+        default="tfidf",
+        help="Evidence ranking backend (default: tfidf)",
+    )
+    investigation.add_argument(
+        "--torch-artifact",
+        type=Path,
+        help="Use an explicit local PyTorch research run instead of the active detector",
+    )
     app = commands.add_parser("app", help="Start the local investigation dashboard")
     app.add_argument("--port", type=int, default=8511)
     args = parser.parse_args()
@@ -74,7 +85,11 @@ def main() -> int:
                 from forge.agents.service import investigate_recording
                 from forge.reports.incident import export, markdown
 
-                report = investigate_recording(args.recording)
+                report = investigate_recording(
+                    args.recording,
+                    retrieval_backend=args.retriever,
+                    torch_artifact=args.torch_artifact,
+                )
                 if args.export:
                     for path in export(report, PROJECT_ROOT / "reports/incidents"):
                         print(path)
