@@ -74,3 +74,16 @@ not call an LLM.
 
 [Training details and limitations](pytorch-demo.md) |
 [BM25 scoring and per-query comparison](bm25-demo.md)
+
+
+## Integration verification
+
+The main-checkout run `pytorch-20261007T111233Z-b8da62e6` reproduced the initial
+training history, selected threshold and validation counts. The integrated test
+suite passed all 157 tests. Notebook 06 executed all six code cells and saved two
+inline Plotly charts plus a combined investigation report. Its source is committed;
+executed outputs remain in the local notebook.
+
+Both feature branches passed separate scope and code-quality reviews before
+local merging. The source manifests, original model pointers and notebooks 02-05
+retained their pre-work hashes. The existing app remains on its prior defaults.
