@@ -1,8 +1,9 @@
 # Typed investigation tools
 
 This increment gives FORGE two typed local tools and a bounded dispatcher for a
-future LLM adapter. The runnable demo uses a scripted caller. It does not call a
-language model, interpret a natural-language request or generate an explanation.
+model adapter. The runnable demo on this page uses a scripted caller. It does not
+call a language model, interpret a natural-language request or generate an
+explanation.
 The existing Streamlit and LangGraph investigation paths are unchanged.
 
 ## Tools and results
@@ -81,7 +82,7 @@ network search, equipment control or arbitrary file-access capability.
 The 25 new tests cover measured scoring, annotation exclusion, unavailable
 readings, pinned test-partition rejection, retrieval abstention and citation
 tampering, input schemas, call budgets, duplicate IDs, result size, error
-sanitization and the scripted demo. The complete suite passed 182 tests.
+sanitization and the scripted demo. At that milestone, the complete suite passed 182 tests.
 
 Real local runs also confirmed:
 
@@ -94,16 +95,14 @@ Real local runs also confirmed:
 These checks verify software behavior, not detector generalization or retrieval
 quality. Model pointers, training data and existing notebooks were not changed.
 
-## Next integration
+## Local model integration
 
-The next step is a provider adapter that supplies these schemas to a language
-model, validates its requested calls and returns each tool result to that model.
-That step also needs a bounded model-turn loop, provider and spending settings,
-and a separate validator for generated claims and citations. The schemas here
-are provider-neutral and are not asserted to satisfy any provider's strict
-function-calling format without adaptation.
+The separate [local LLM demo](local-llm.md) now connects these tools to Ollama.
+It adapts the schemas to native tool calling, bounds model requests, and checks
+the generated report's structured facts and exact citation/check pairs. Its
+free-form explanation remains unreviewed model text. This does not establish
+complete factual grounding or resistance to prompt injection.
 
-Those components are not implemented by this increment. Citation checking on
-tool results does not yet validate a future LLM's final answer or establish
-resistance to prompt injection. Existing provider environment variables still
-do not enable model calls.
+The scripted command above remains useful for testing tools without a language
+model. The local model command requires explicit enablement on each run and does
+not change the existing Streamlit or LangGraph policy workflow.
