@@ -54,6 +54,9 @@ class Inspection(Contract):
     alerted_rows: int
     alert_onsets: int
     peak_timestamp: str | None
+    first_alert_timestamp: str | None = None
+    last_alert_timestamp: str | None = None
+    recording_timezone: str = "Unspecified in source recording"
     sensors: list[SensorFinding]
     initialization_requirement: str
     interpretation: str = (
@@ -177,6 +180,19 @@ class InvestigationTools:
             alerted_rows=int(alerts.sum()),
             alert_onsets=len(onsets),
             peak_timestamp=peak_timestamp,
+            first_alert_timestamp=(
+                frame.datetime.iloc[int(onsets[0])].isoformat() if len(onsets) else None
+            ),
+            last_alert_timestamp=(
+                frame.datetime.iloc[int(np.flatnonzero(alerts)[-1])].isoformat()
+                if alerts.any()
+                else None
+            ),
+            recording_timezone=(
+                str(frame.datetime.dt.tz)
+                if frame.datetime.dt.tz is not None
+                else "Unspecified in source recording"
+            ),
             sensors=sensors,
             initialization_requirement=descriptor.get(
                 "initialization_requirement", "No startup reference required."

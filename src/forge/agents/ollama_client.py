@@ -4,8 +4,10 @@ import http.client
 import json
 import re
 
+from forge.agents.model_client import ModelError
 
-class OllamaError(RuntimeError):
+
+class OllamaError(ModelError):
     """A local model request could not be completed safely."""
 
 

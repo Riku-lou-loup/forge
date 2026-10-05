@@ -2,11 +2,12 @@
 
 import json
 import time
+from datetime import datetime, timezone
 from typing import Literal
 
 from pydantic import Field, ValidationError
 
-from forge.agents.ollama_client import OllamaError
+from forge.agents.model_client import ModelClient, ModelError
 from forge.agents.tool_runtime import ToolCall, ToolSession
 from forge.agents.tools import (
     Contract,
@@ -80,7 +81,7 @@ def validate_draft(draft, inspection, passages):
 
 
 def investigate_local(
-    question, recording_id, *, client, tools, enabled=False, deadline_seconds=600
+    question, recording_id, *, client: ModelClient, tools, enabled=False, deadline_seconds=600
 ):
     if not enabled:
         raise ValueError("Local model calls require explicit enablement.")
@@ -89,6 +90,7 @@ def investigate_local(
         raise ValueError("Question must contain 1 to 1000 characters.")
     if not 1 <= deadline_seconds <= 600:
         raise ValueError("Deadline must be between 1 and 600 seconds.")
+    started_at = datetime.now(timezone.utc).isoformat()
     started = time.monotonic()
     identity = client.identity()
     session = ToolSession(tools, max_calls=3)
@@ -106,11 +108,11 @@ def investigate_local(
         nonlocal model_attempts
         remaining = deadline_seconds - (time.monotonic() - started)
         if remaining <= 0:
-            raise OllamaError("Investigation deadline exhausted.")
+            raise ModelError("Investigation deadline exhausted.")
         model_attempts += 1
         try:
             response = client.chat(history, timeout=min(180, remaining), **kwargs)
-        except OllamaError as error:
+        except ModelError as error:
             model_trace.append(
                 {
                     "phase": "synthesis" if "schema" in kwargs else "tool_selection",
@@ -221,7 +223,7 @@ def investigate_local(
             raise ValueError("Synthesis must not request more tools.")
         draft = AnswerDraft.model_validate_json(answer.get("content", ""))
         validate_draft(draft, inspection, passages)
-    except (OllamaError, ValueError, ValidationError) as error:
+    except (ModelError, ValueError, ValidationError) as error:
         draft = None
         # No rejected generated prose is presented as an accepted report.
         failure = (
@@ -232,6 +234,8 @@ def investigate_local(
 
     return {
         "mode": "local_llm_investigation",
+        "investigation_started_at": started_at,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": "draft" if draft else "blocked",
         "review_required": True,
         "llm_called": model_attempts > 0,
@@ -259,6 +263,15 @@ def investigate_local(
 
 def markdown_report(result):
     lines = ["# FORGE local investigation", "", "Status: " + result["status"], ""]
+    lines.extend(
+        [
+            "Investigation started (UTC): "
+            + result.get("investigation_started_at", "Not recorded"),
+            "",
+            "Report generated (UTC): " + result.get("generated_at", "Not recorded"),
+            "",
+        ]
+    )
     if result["draft"] is None:
         return "\n".join(
             [*lines, "No accepted draft. " + (result["failure"] or "Setup failed."), ""]
@@ -272,6 +285,21 @@ def markdown_report(result):
             f"Recording `{draft['recording_id']}`: **{draft['status']}**. "
             f"{draft['alerted_rows']} alerted rows; {draft['unavailable_rows']} unavailable rows. "
             f"{inspection['scored_rows']} of {inspection['rows']} rows were scored.",
+            "",
+            "## Recorded alert timing",
+            "",
+            "Source timezone: " + inspection.get("recording_timezone", "Unspecified"),
+            "",
+            "First alerted measurement: "
+            + (inspection.get("first_alert_timestamp") or "Not available"),
+            "",
+            "Last alerted measurement: "
+            + (inspection.get("last_alert_timestamp") or "Not available"),
+            "",
+            "Peak scored snapshot: " + (inspection.get("peak_timestamp") or "Not available"),
+            "",
+            "These are source-recording times, not confirmed failure times. "
+            "The first-to-last span may contain separate alerts and gaps.",
             "",
             "## Model explanation (unreviewed)",
             "",

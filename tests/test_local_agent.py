@@ -2,6 +2,7 @@
 
 import copy
 import json
+from datetime import datetime, timedelta
 
 import pytest
 from test_agent_tools import toolkit as toolkit
@@ -80,6 +81,12 @@ def test_model_selected_calls_receive_real_tool_results(toolkit):
     assert "schema" in model.requests[-1][1] and "tools" not in model.requests[-1][1]
     assert "unreviewed" in markdown_report(result)
     assert "Human review is required" in markdown_report(result)
+    start = datetime.fromisoformat(result["investigation_started_at"])
+    end = datetime.fromisoformat(result["generated_at"])
+    assert start.utcoffset() == end.utcoffset() == timedelta(0)
+    assert start <= end
+    assert "2020-01-01T00:00:02" in markdown_report(result)
+    assert result["generated_at"] in markdown_report(result)
 
 
 @pytest.mark.parametrize("tamper", ["count", "citation", "check", "duplicate", "missing", "schema"])
@@ -365,7 +372,7 @@ def test_cli_unloads_model_after_failed_investigation(monkeypatch):
             released.append(True)
 
     monkeypatch.setattr(local_demo, "require_memory_headroom", lambda: None)
-    monkeypatch.setattr(local_demo, "OllamaClient", LocalClient)
+    monkeypatch.setattr(local_demo, "create_client", lambda *a, **k: LocalClient())
 
     def fail(*args, **kwargs):
         raise OllamaError("Provider failed")
@@ -389,7 +396,7 @@ def test_cli_unloads_after_success(monkeypatch):
             released.append(True)
 
     monkeypatch.setattr(local_demo, "require_memory_headroom", lambda: None)
-    monkeypatch.setattr(local_demo, "OllamaClient", LocalClient)
+    monkeypatch.setattr(local_demo, "create_client", lambda *a, **k: LocalClient())
     monkeypatch.setattr(local_demo, "markdown_report", lambda result: "Draft")
     monkeypatch.setattr(
         local_demo,
@@ -402,3 +409,32 @@ def test_cli_unloads_after_success(monkeypatch):
     )
     assert local_demo.main(["--enable-llm"]) == 0
     assert released == [True]
+
+
+def test_timestamped_export_keeps_source_time_separate(toolkit, monkeypatch, tmp_path):
+    from forge.agents import local_demo
+
+    tools, _ = toolkit
+    result = run(standard_model(draft_for(tools)), tools)
+    result["generated_at"] = "2026-10-07T21:22:06.123456+00:00"
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def unload(self):
+            pass
+
+    monkeypatch.setattr(local_demo, "require_memory_headroom", lambda: None)
+    monkeypatch.setattr(local_demo, "create_client", lambda *a, **k: Client())
+    monkeypatch.setattr(local_demo, "InvestigationTools", lambda **kwargs: tools)
+    monkeypatch.setattr(local_demo, "investigate_local", lambda *a, **k: result)
+    assert main(["--enable-llm", "--export", "--root", str(tmp_path)]) == 0
+    traces = list((tmp_path / "reports/incidents").glob("*.json"))
+    assert len(traces) == 1
+    assert traces[0].name.startswith("local-llm-20261007T212206123456Z-valve1-1-")
+    payload = json.loads(traces[0].read_text(encoding="utf-8"))
+    assert payload["inspection"]["first_alert_timestamp"] == "2020-01-01T00:00:02"
+    report = traces[0].with_suffix(".md").read_text(encoding="utf-8")
+    assert "2026-10-07T21:22:06.123456+00:00" in report
+    assert "2020-01-01T00:00:02" in report

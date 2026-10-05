@@ -48,6 +48,9 @@ def test_inspection_strips_annotations_and_returns_measured_findings(toolkit):
     assert result.status == "alert"
     assert result.rows == result.scored_rows == 8
     assert result.alerted_rows == 6 and result.alert_onsets == 1
+    assert result.first_alert_timestamp == "2020-01-01T00:00:02"
+    assert result.last_alert_timestamp == "2020-01-01T00:00:07"
+    assert result.recording_timezone == "Unspecified in source recording"
     assert result.sensors[0].sensor == "Pressure"
     assert result.model_run == "synthetic-test"
     assert "changepoint" not in result.model_dump_json()
@@ -59,6 +62,7 @@ def test_unavailable_scores_cannot_create_alerts(toolkit):
     result = tools.inspect_recording(agent_tools.InspectRecordingArgs(recording_id="valve1/1"))
     assert result.status == "insufficient_data" and result.scored_rows == 0
     assert result.score_max is None and not result.sensors and result.alerted_rows == 0
+    assert result.first_alert_timestamp is None and result.last_alert_timestamp is None
 
 
 def test_search_uses_real_bm25_and_abstains(toolkit):
