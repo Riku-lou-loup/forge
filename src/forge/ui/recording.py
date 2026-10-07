@@ -4,10 +4,11 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from forge.data.sample import SENSOR_UNITS, audit_recording, load_sample, sample_manifest
+from forge.ui.presentation import chart_style
 
 
 def render_recording() -> None:
-    st.subheader("Explore one real recording")
+    st.subheader("Sensor explorer")
     st.write(
         "Each row contains measurements at one recorded time. Choose a sensor and compare "
         "its signal with the experiment's annotation."
@@ -64,8 +65,9 @@ def render_recording() -> None:
         legend={"orientation": "h", "y": 1.12},
         margin={"t": 45, "b": 35},
     )
+    chart_style(chart, 390)
     st.plotly_chart(chart, width="stretch")
-    st.info(
+    st.caption(
         "The colored points show labels supplied with the dataset. They are not model "
         "predictions. Model scores are available in the Investigate tab."
     )

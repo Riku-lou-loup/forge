@@ -59,3 +59,17 @@ def test_missing_model_shows_setup_instructions(monkeypatch):
     app = AppTest.from_file(str(PROJECT_ROOT / "src/forge/ui/app.py")).run(timeout=30)
     assert not app.exception
     assert any("Train the local detector" in message.value for message in app.info)
+
+
+def test_saved_evaluation_views_render(monkeypatch):
+    import forge.ui.investigation as ui
+
+    def absent(**kwargs):
+        raise FileNotFoundError("No local model")
+
+    monkeypatch.setattr(ui, "load_model", absent)
+    app = AppTest.from_file(str(PROJECT_ROOT / "src/forge/ui/app.py")).run(timeout=30)
+    for scope in ["Grouped audit", "Development comparison", "Original benchmark"]:
+        app.radio(key="evaluation_scope").set_value(scope).run(timeout=30)
+        assert not app.exception
+        assert len(app.get("plotly_chart")) > 0

@@ -4,23 +4,34 @@ import streamlit as st
 
 from forge.cli import environment_report
 from forge.config import PROJECT_ROOT
-from forge.ui.investigation import render_investigation, render_results
+from forge.ui.evaluation import render_results
+from forge.ui.investigation import render_investigation
+from forge.ui.motion import render_workflow
+from forge.ui.presentation import apply_style
 from forge.ui.recording import render_recording
 
-st.set_page_config(page_title="FORGE | Equipment investigation", page_icon="⚙", layout="wide")
+st.set_page_config(page_title="FORGE | Pump investigation", layout="wide")
+apply_style()
 with st.sidebar:
     st.title("FORGE")
-    st.caption("Equipment investigation workspace")
+    st.caption("Pump anomaly investigation")
     st.divider()
-    st.markdown("**Current stage**  \nPrecision-focused detector development and evidence workflow")
-    st.markdown("**First domain**  \nRecorded pump measurements")
-    st.caption("Local analysis · human review · no model API calls")
+    st.write("Run investigations locally.")
+    st.caption("Inspect an alert, read the supporting passages, and export a report for review.")
+    show_workflow = st.toggle("Show workflow animation", value=True)
+    st.divider()
+    st.markdown("[Project repository](https://github.com/Riku-lou-loup/forge)")
+    st.caption("Python / scikit-learn / LangGraph")
+    st.html(
+        '<p class="forge-note">Research prototype using SKAB laboratory recordings. Equipment actions remain outside this application.</p>'
+    )
 
-st.caption("FORGE / EQUIPMENT INVESTIGATION")
-st.title("From a machine alert to evidence you can inspect.")
-st.write(
-    "Score real pump measurements, inspect a persistent alert, and retrieve analytical guidance with citations. Review the findings before exporting an investigation record."
-)
+st.html('<div class="forge-rule" aria-hidden="true"></div>')
+st.title("Pump measurements and evidence")
+st.write("Choose a recording to inspect its signal and investigate an alert.")
+if show_workflow:
+    render_workflow()
+
 investigation, recording, results, environment, data_notes = st.tabs(
     ["Investigate", "Explore recording", "Evaluation", "Environment", "Data notes"]
 )
@@ -31,12 +42,12 @@ with recording:
 with results:
     render_results()
 with environment:
+    st.subheader("Local environment")
     report = environment_report()
-    st.code(str(PROJECT_ROOT), language=None)
     if all(report["packages"].values()) and report["isolated_environment"]:
-        st.success("The project interpreter and required libraries are available.")
+        st.success("The project environment is ready.")
     else:
-        st.error("Run the setup instructions in README.md to repair the environment.")
+        st.error("Run the setup commands in README.md to repair the environment.")
     st.dataframe(
         [
             {"Library": name, "Version": value or "Missing"}
@@ -45,24 +56,29 @@ with environment:
         hide_index=True,
         width="stretch",
     )
-    st.caption(f"Python {report['python']} · {report['interpreter']}")
-    st.write(
-        "Trained artifact available"
-        if report["trained_artifact_present"]
-        else "Run the training command to create the local artifact."
-    )
-    st.caption(
-        "The implemented workflow uses local policy agents and extractive drafting. Provider configuration does not enable language-model calls."
-    )
+    with st.expander("Paths and interpreter"):
+        st.code(str(PROJECT_ROOT), language=None)
+        st.caption(f"Python {report['python']} · {report['interpreter']}")
+    st.caption("Investigations run locally. Provider settings do not enable LLM calls.")
 with data_notes:
-    st.subheader("Reading the evidence")
-    st.markdown(
-        "1. Eight sensor columns supply model features; timestamps preserve ordering and gaps.\n2. Source annotations are excluded from model inputs and investigation evidence. Supervised development uses training anomaly annotations as targets.\n3. The original Isolation Forest fits normal rows only. The precision-focused classifier uses relative and rolling features, with 60 unscored initialization readings.\n4. Validation selects settings. New development results are not an independent test; the original test was already inspected.\n5. Retrieved notes are project-authored analytical guidance, not manufacturer instructions. This laboratory benchmark does not establish fault diagnosis, reliability on another machine, or saved downtime."
-    )
+    st.subheader("About these recordings")
     st.write(
-        "See `docs/architecture.md`, `docs/evaluation.md`, and `data/README.md` for implementation and provenance."
+        "SKAB records pump experiments across eight sensor channels. Timestamps preserve the order and gaps in the measurements. Source labels can be overlaid on a chart for comparison."
     )
-    st.code(
-        r".\.venv\Scripts\python.exe -m forge investigate --recording valve1/1 --export",
-        language="powershell",
+    with st.expander("Models and startup", expanded=True):
+        st.write(
+            "The active gradient-boosting model learns from normal and anomalous training examples. Its first 60 readings establish a reference and receive no assessment. A fault present throughout startup may be missed."
+        )
+        st.write(
+            "Isolation Forest remains the original baseline. It was fitted on normal readings only. The grouped audit refits both approaches on different recording groups; the tuned research artifact has not been activated."
+        )
+    with st.expander("Labels, guidance and limits"):
+        st.write(
+            "Anomaly annotations supply training targets and evaluation labels. They are excluded from model inputs and investigation evidence. An annotated anomaly does not establish a physical fault."
+        )
+        st.write(
+            "Retrieved passages are project-authored analytical notes. They are not manufacturer instructions. The workflow copies supported checks and verifies their citations before human review."
+        )
+    st.caption(
+        "Sources and reproduction: data/README.md, docs/architecture.md, docs/generalization-results.md."
     )

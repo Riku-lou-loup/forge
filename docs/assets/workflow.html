@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Signal to evidence — animation source</title>
+<style>
+:root {
+  --duration-fast: 160; --duration-normal: 320; --duration-slow: 640; --duration-deliberate: 800;
+  --stagger: 40; --ease-standard: cubic-bezier(.2,0,0,1);
+  --ease-enter: cubic-bezier(.16,1,.3,1); --ease-exit: cubic-bezier(.4,0,1,1);
+  --brass: #e7b969; --signal: #ee886b; --evidence: #8dc5aa;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration-fast: 0; --duration-normal: 0; --duration-slow: 0; --duration-deliberate: 0; --stagger: 0; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: transparent; color: #8dc5aa; font-family: 'Segoe UI',sans-serif; }
+canvas { display: block; width: 100%; height: auto; }
+.controls { display: flex; align-items: center; gap: 12px; padding: 12px 24px; }
+button { background: #286047; border: 0; border-radius: 5px; color: #fff; padding: 9px 16px; font: 600 14px 'Segoe UI'; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid #b47b27; outline-offset: 3px; }
+input { width: min(380px,50vw); accent-color: #b47b27; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+</style>
+<canvas width="1200" height="460" role="img" aria-label="An illustrated sensor interval is isolated, matched to analytical notes, and carried into a cited draft awaiting human review."></canvas>
+<p class="sr-only">Signals and timing illustrate the workflow. The notes are project-authored. The animation makes no diagnosis and does not show an approved report.</p>
+<div class="controls"><button type="button">Pause</button><label class="sr-only" for="seek">Animation position</label><input id="seek" type="range" min="0" max="14.4" step="0.04" value="0"></div>
+<script>
+const q = new URLSearchParams(location.search), media = matchMedia('(prefers-reduced-motion: reduce)');
+const dark = q.get('theme') === 'dark' || (!q.has('theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+const C = dark
+  ? { brass:'#e7b969', signal:'#ee886b', evidence:'#8dc5aa', ink:'#e5eee8', muted:'#a1b7a9', line:'#547665', quiet:'#385144', paper:'#16261e', fold:'#294336' }
+  : { brass:'#925e12', signal:'#b8442c', evidence:'#287450', ink:'#263c2f', muted:'#506b59', line:'#729985', quiet:'#b9cfc0', paper:'#f0f5ee', fold:'#d3e3d4' };
+const canvas = document.querySelector('canvas'), c = canvas.getContext('2d');
+const css = () => getComputedStyle(document.documentElement);
+const duration = name => Number(css().getPropertyValue('--duration-' + name)) / 1000;
+const clamp = n => Math.max(0,Math.min(1,n));
+const mix = (a,b,t) => a+(b-a)*t;
+function bezier(x1,y1,x2,y2) {
+  const coord = (p,a,b) => 3*(1-p)*(1-p)*p*a + 3*(1-p)*p*p*b + p*p*p;
+  return x => { x=clamp(x); if(x===0||x===1)return x;let lo=0,hi=1,p=x; for(let i=0;i<14;i++){p=(lo+hi)/2;if(coord(p,x1,x2)<x)lo=p;else hi=p;} return coord(p,y1,y2); };
+}
+const E = { standard:bezier(.2,0,0,1), enter:bezier(.16,1,.3,1), exit:bezier(.4,0,1,1) };
+function move(t,start,token='slow',curve='standard') { const d=duration(token); return t<start?0:d===0?1:E[curve]((t-start)/d); }
+function alpha(a,fn) { if(a<=0)return; c.save();c.globalAlpha*=clamp(a);fn();c.restore(); }
+function text(s,x,y,size=20,color=C.ink,weight=600) { c.fillStyle=color;c.font=`${weight} ${size}px "Segoe UI",sans-serif`;c.fillText(s,x,y); }
+function line(points,color=C.line,width=2) { c.strokeStyle=color;c.lineWidth=width;c.lineCap='round';c.lineJoin='round';c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke(); }
+function rect(x,y,w,h,color,r=0) { if(w<=0||h<=0)return;c.fillStyle=color;c.beginPath();c.roundRect(x,y,w,h,r);c.fill(); }
+function clip(x,y,w,h,fn) { c.save();c.beginPath();c.rect(x,y,Math.max(0,w),Math.max(0,h));c.clip();fn();c.restore(); }
+function wave(u,i=7) {
+  const baseline=Math.sin(u*39+i*.9)*.13+Math.sin(u*89+i*2)*.055+Math.sin(u*181+i)*.04;
+  const envelope=Math.exp(-Math.pow((u-.58)/.095,2));
+  return baseline + (i===7?1.35:i===3?.48:.1)*Math.sin(u*104)*envelope;
+}
+function trace(x,y,w,h,color,i=7,width=2.3,from=0,to=1) {
+  const points=[]; for(let n=0;n<=280;n++){const position=n/280,u=mix(from,to,position);points.push([x+position*w,y-wave(u,i)*h]);} line(points,color,width);
+}
+function bracket(x,y,w,h,p,color=C.brass) {
+  if(p<=0)return; const k=13*p;
+  for(const [xx,sgn] of [[x,1],[x+w,-1]]) { line([[xx+sgn*k,y],[xx,y],[xx,y+h],[xx+sgn*k,y+h]],color,2.5); }
+}
+function paper(x,y,w,h,fill=C.paper) {
+  const fold=19;
+  c.fillStyle=fill;c.strokeStyle=C.line;c.lineWidth=1.2;c.beginPath();c.moveTo(x,y);c.lineTo(x+w-fold,y);c.lineTo(x+w,y+fold);c.lineTo(x+w,y+h);c.lineTo(x,y+h);c.closePath();c.fill();c.stroke();
+  c.fillStyle=C.fold;c.beginPath();c.moveTo(x+w-fold,y);c.lineTo(x+w-fold,y+fold);c.lineTo(x+w,y+fold);c.fill();
+}
+function pathAt(p,a,b,d,e) { const n=1-p;return [n*n*n*a[0]+3*n*n*p*b[0]+3*n*p*p*d[0]+p*p*p*e[0],n*n*n*a[1]+3*n*n*p*b[1]+3*n*p*p*d[1]+p*p*p*e[1]]; }
+function route(a,b,d,e,amount=1,color=C.line,width=1.5) { const pts=[];for(let j=0;j<=60*amount;j++)pts.push(pathAt(j/60,a,b,d,e));line(pts,color,width); }
+function citation(x,y,i,scale=1) {
+  c.save();c.translate(x,y);c.scale(scale,scale);rect(-17,-14,34,28,C.evidence,4);text(String(i+1),-5,7,18,C.paper,700);c.restore();
+}
+const notes=[['Flow readings','and operating context'],['Gaps and','recording boundaries'],['A statistical alert','is not a diagnosis']];
+const labels=['Vibration 1','Vibration 2','Current','Pressure','Temperature','Fluid temp.','Voltage','Flow'];
+function render(seconds, respectPreference=true) {
+  const t=respectPreference&&media.matches?11.5:((seconds%14.4)+14.4)%14.4;
+  c.clearRect(0,0,1200,460);
+  const reset=move(t,12.4,'deliberate','exit');
+  const focus=move(t,2.12,'deliberate')*(1-reset);
+  const fadeOut=1-move(t,12.0,'slow','exit');
+  const noteIn=move(t,3.6,'deliberate','enter');
+  const gather=move(t,7.0,'slow');
+  const reportIn=move(t,7.6,'deliberate','enter');
+
+  // The same sampled polyline moves from the recording field into the selected interval.
+  for(let i=0;i<8;i++) {
+    const selected=i===7;
+    const x=mix(159,60,focus), y=mix(64+i*42,selected?244:84+i*13,focus);
+    const w=mix(992,282,focus), h=mix(15,selected?45:4,focus);
+    const active=selected&&t>1.55&&t<12.95;
+    const opacity=selected?1:mix(.9,.38,focus);
+    alpha(opacity,()=>trace(x,y,w,h,active?C.signal:C.line,i,selected?3:1.8,mix(0,.475,focus),mix(1,.7,focus)));
+    alpha(1-focus,()=>text(labels[i],24,70+i*42,17,selected&&active?C.signal:C.muted,selected?700:500));
+  }
+  // A travelling read head is a bounded sweep through the signal field.
+  const scan=move(t,.08,'deliberate');
+  alpha((1-focus)*(1-move(t,1.65,'fast'))+move(t,13.6,'normal'),()=>{
+    const x=t>=13.6?164:mix(164,1147,scan);line([[x,43],[x,378]],C.brass,1.7);
+    for(let i=0;i<8;i++)rect(x-2,61+i*42,4,7,C.brass,1);
+  });
+  const select=move(t,1.4,'slow');
+  alpha(select*(1-focus)*fadeOut,()=>{
+    bracket(159+992*.475,39,992*.225,345,select);
+    line([[633,397],[856,397]],C.signal,4);
+  });
+  alpha(focus,()=>{
+    bracket(53,185,296,119,1,C.signal);
+    text('Selected interval',61,338,23,C.signal,700);
+    text('8 sensor channels',61,60,17,C.muted,500);
+  });
+
+  const evidenceOpacity=noteIn*fadeOut;
+  if(evidenceOpacity>0) alpha(evidenceOpacity,()=>{
+    alpha(1-gather,()=>text('Supporting notes',486,68,23,C.evidence,700));
+    for(let i=0;i<3;i++) {
+      const stagger=Number(css().getPropertyValue('--stagger'))/1000;
+      const p=move(t,3.6+i*stagger,'slow','enter');
+      const fanX=[471,688,905][i],fanY=[140,105,140][i];
+      const x=mix(mix(708,fanX,p),467,gather);
+      const y=mix(mix(195,fanY,p),102+i*91,gather);
+      const w=mix(225,258,gather),h=mix(207,74,gather);
+      const angle=mix([-7,0,7][i]*(Math.PI/180)*p,0,gather);
+      c.save();c.translate(x+w/2,y+h/2);c.rotate(angle);c.translate(-w/2,-h/2);
+      paper(0,0,w,h);
+      if(gather<.8) alpha(1-gather,()=>{
+        text('['+(i+1)+']',18,31,22,C.brass,700);
+        text(notes[i][0],18,66,17,C.ink,600);text(notes[i][1],18,89,17,C.ink,600);
+        for(let j=0;j<4;j++)rect(18,112+j*15,Math.min(182,[174,145,185,112][j]),3,C.quiet,1);
+        const reveal=move(t,4.6+i*.24,'normal');
+        rect(15,163,190*reveal,26,C.fold,2);
+        clip(15,160,190*reveal,31,()=>{rect(23,174,145,4,C.evidence,1);text('['+(i+1)+']',178,181,16,C.evidence,700);});
+      });
+      alpha(gather,()=>{
+        text('['+(i+1)+']',15,27,19,C.brass,700);
+        text(notes[i][0],56,28,17,C.ink,600);text(notes[i][1],56,51,17,C.ink,600);
+      });
+      c.restore();
+    }
+    // A query moves toward the corpus, then returned citation IDs keep their identity.
+    const query=move(t,3.3,'slow');
+    alpha(1-gather,()=>{
+      route([350,242],[400,242],[404,174],[464,174],query,C.line,2);
+      const packet=move(t,4.08,'slow');
+      if(packet>0&&packet<1){const at=pathAt(packet,[350,242],[400,242],[404,174],[464,174]);rect(at[0]-7,at[1]-3,14,6,C.brass,2);}
+    });
+  });
+
+  if(reportIn>0) alpha(reportIn*fadeOut,()=>{
+    const x=838+34*(1-reportIn),y=53;
+    clip(x-1,y-1,308,349*reportIn+2,()=>{
+      paper(x,y,306,347);
+      text('Draft',x+23,y+43,29,C.brass,700);
+      text('Selected interval',x+23,y+73,16,C.muted,500);
+      const signalArrives=move(t,8.38,'slow');
+      if(signalArrives>=.999)trace(x+23,y+113,260,24,C.signal,7,2.6,.475,.7);
+      line([[x+23,y+154],[x+283,y+154]],C.quiet,1);
+      text('Evidence',x+23,y+187,18,C.ink,600);
+      for(let i=0;i<3;i++) {
+        const show=move(t,9.05+i*.24,'normal');
+        if(show>0) {
+          rect(x+23,y+210+i*23,(197-i*22)*show,4,C.line,2);
+          alpha(show,()=>text('['+(i+1)+']',x+256,y+216+i*23,17,C.evidence,700));
+        }
+      }
+      const stamp=move(t,10.05,'normal');
+      alpha(stamp,()=>{
+        c.save();c.translate(x+23,y+309+7*(1-stamp));text('Awaiting human review',0,0,19,C.signal,700);c.restore();
+      });
+    });
+  });
+
+  // The extracted signal becomes the report's observation, with a single curved transfer.
+  const transfer=move(t,8.38,'slow');
+  if(transfer>0&&transfer<.999)alpha(fadeOut,()=>{
+    const at=pathAt(transfer,[60,244],[339,23],[665,24],[861,166]);
+    trace(at[0],at[1],mix(282,260,transfer),mix(45,24,transfer),C.signal,7,3,.475,.7);
+  });
+  if(gather>0)alpha(gather*fadeOut,()=>{
+    for(let i=0;i<3;i++){
+      const a=[730,138+i*91],b=[777,138+i*91],d=[782,263+i*23],e=[836,263+i*23];
+      route(a,b,d,e,reportIn,C.quiet,1.5);
+      const p=move(t,8.65+i*.24,'slow');
+      if(p>0&&p<1){const [x,y]=pathAt(p,a,b,d,e);citation(x,y,i);}
+    }
+    text('Source-linked passages',467,407,18,C.evidence,600);
+  });
+  const captions=t<2.12||t>=12.4?'Recorded signals':t<3.6?'Persistent alert':t<7.6?'Retrieve evidence':'Prepare a cited draft';
+  alpha(t>=12.4?reset:fadeOut,()=>text(captions,24,439,21,t<3.6||t>=12.4?C.signal:C.brass,650));
+}
+window.renderForge=(t)=>render(t,false);
+window.motionTokens={durations:{fast:160,normal:320,slow:640,deliberate:800},stagger:40,easing:{standard:[.2,0,0,1],enter:[.16,1,.3,1],exit:[.4,0,1,1]},loop:14.4};
+const button=document.querySelector('button'),seek=document.querySelector('input');
+let paused=media.matches||q.has('time'),time=q.has('time')?Number(q.get('time')):media.matches?11.5:0,previous=null;
+function label(){button.textContent=paused?'Play':'Pause';button.setAttribute('aria-pressed',String(!paused));}
+button.onclick=()=>{paused=!paused;label();};
+seek.oninput=()=>{time=Number(seek.value);paused=true;label();render(time,false);};
+media.addEventListener('change',()=>{paused=media.matches;if(paused)time=11.5;label();render(time);});
+function tick(now){if(previous!==null&&!paused&&!document.hidden)time=(time+Math.min((now-previous)/1000,.08))%14.4;previous=now;render(time);seek.value=time;requestAnimationFrame(tick);}
+label();
+if(q.has('capture')){document.querySelector('.controls').hidden=true;document.querySelector('.controls').style.display='none';render(q.has('time')?time:11.5,false);}
+else requestAnimationFrame(tick);
+</script>
+</html>
