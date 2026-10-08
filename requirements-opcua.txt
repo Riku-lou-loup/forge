@@ -1,0 +1,12 @@
+# Optional OPC UA demo snapshot: Windows x86-64, Python 3.13.
+# Install after requirements-lock.txt; the base app does not require this extra.
+-c requirements-lock.txt
+aiofiles==25.1.0
+aiosqlite==0.22.1
+asyncua==1.1.8
+cffi==2.1.1
+cryptography==50.0.2
+pycparser==3.11
+pyopenssl==26.4.0
+pytz==2026.5
+sortedcontainers==2.4.0
