@@ -1,0 +1,3961 @@
+{
+  "schema_version": 1,
+  "run_id": "20261010T184310Z-8fbbcc72",
+  "config": {
+    "protocol": "forge-score-median-refinement-v1",
+    "scope": "Retrospective development audit over original train and validation recordings only. Previously inspected data and informed model family choices; not a fresh holdout or a future-time/unseen-machine benchmark.",
+    "seed": 42,
+    "outer_folds": 5,
+    "inner_folds": 3,
+    "splitter": "GroupKFold with shuffle=True, random_state=42; whole overlap groups, not individual readings. Same seed for every inner split.",
+    "reference_readings": 60,
+    "rolling_readings": 20,
+    "max_gap_seconds": 2,
+    "persistence_candidates": [
+      3,
+      5
+    ],
+    "threshold_quantiles": 101,
+    "minimum_point_recall": 0.6,
+    "minimum_event_recall": 0.6,
+    "minimum_group_point_recall": 0.2,
+    "target_precision": 0.95,
+    "target_false_positive_rate": 0.01,
+    "target_false_alarm_onsets_per_normal_hour": 2.0,
+    "selection": "Fixed HGB and fixed smoothing window. Select threshold and persistence independently per procedure on pooled inner out-of-fold predictions only; existing precision-first recall constraints and fallback apply.",
+    "infeasible_fallback": "If no point satisfies all recall floors, maximize the minimum capped ratio of achieved recall to each required recall floor, then precision, then minimize false-onset frequency, then recall. Disclose infeasibility. Do not change constraints or discard the outer fold.",
+    "reference_candidate": "current_hgb",
+    "candidates": [
+      {
+        "id": "current_hgb",
+        "max_iter": 200,
+        "max_leaf_nodes": 7,
+        "min_samples_leaf": 30,
+        "l2_regularization": 10.0,
+        "learning_rate": 0.05,
+        "early_stopping": false
+      }
+    ],
+    "isolation_forest": {
+      "n_estimators": 256,
+      "max_samples": 1024
+    },
+    "threads": 1,
+    "final_refit": "None. Paired outer-fold evidence only; no activation.",
+    "reporting": "Paired pooled and per-group confusion counts, precision, recall, F1, false readings/onsets, availability, delay and shared fit/raw score/median runtime. No point adjustment, no old test access, no final refit or activation.",
+    "smoothing_readings": 15,
+    "hypothesis": "A fixed causal 15-ready-reading score median may reduce fragmented false alerts; it can delay or miss short events. No smoothing-window search or outer-result tuning.",
+    "procedures": [
+      "current_hgb",
+      "median15_hgb"
+    ]
+  },
+  "pool": [
+    {
+      "group": "anomaly-free/anomaly-free",
+      "sources": [
+        "anomaly-free/anomaly-free",
+        "other/5"
+      ],
+      "rows": 9988,
+      "normal": 9578,
+      "anomalous": 410,
+      "unknown": 0,
+      "raw_rows": 10560,
+      "duplicate_rows": 572,
+      "ambiguous_rows": 0,
+      "unique_rows": 9988
+    },
+    {
+      "group": "other/14",
+      "sources": [
+        "other/14"
+      ],
+      "rows": 905,
+      "normal": 603,
+      "anomalous": 302,
+      "unknown": 0,
+      "raw_rows": 905,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 905
+    },
+    {
+      "group": "other/6",
+      "sources": [
+        "other/6"
+      ],
+      "rows": 1147,
+      "normal": 745,
+      "anomalous": 402,
+      "unknown": 0,
+      "raw_rows": 1147,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1147
+    },
+    {
+      "group": "other/9",
+      "sources": [
+        "other/9"
+      ],
+      "rows": 1144,
+      "normal": 743,
+      "anomalous": 401,
+      "unknown": 0,
+      "raw_rows": 1144,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1144
+    },
+    {
+      "group": "valve1/0",
+      "sources": [
+        "valve1/0"
+      ],
+      "rows": 1147,
+      "normal": 746,
+      "anomalous": 401,
+      "unknown": 0,
+      "raw_rows": 1147,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1147
+    },
+    {
+      "group": "valve1/1",
+      "sources": [
+        "valve1/1"
+      ],
+      "rows": 1145,
+      "normal": 743,
+      "anomalous": 402,
+      "unknown": 0,
+      "raw_rows": 1145,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1145
+    },
+    {
+      "group": "valve1/2",
+      "sources": [
+        "valve1/2"
+      ],
+      "rows": 1075,
+      "normal": 738,
+      "anomalous": 337,
+      "unknown": 0,
+      "raw_rows": 1075,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1075
+    },
+    {
+      "group": "valve1/3",
+      "sources": [
+        "valve1/3"
+      ],
+      "rows": 1148,
+      "normal": 744,
+      "anomalous": 404,
+      "unknown": 0,
+      "raw_rows": 1148,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1148
+    },
+    {
+      "group": "valve1/4",
+      "sources": [
+        "valve1/4"
+      ],
+      "rows": 1095,
+      "normal": 746,
+      "anomalous": 349,
+      "unknown": 0,
+      "raw_rows": 1095,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1095
+    },
+    {
+      "group": "valve1/5",
+      "sources": [
+        "valve1/5"
+      ],
+      "rows": 1154,
+      "normal": 751,
+      "anomalous": 403,
+      "unknown": 0,
+      "raw_rows": 1154,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1154
+    },
+    {
+      "group": "valve1/6",
+      "sources": [
+        "valve1/6"
+      ],
+      "rows": 1154,
+      "normal": 749,
+      "anomalous": 405,
+      "unknown": 0,
+      "raw_rows": 1154,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1154
+    },
+    {
+      "group": "valve1/7",
+      "sources": [
+        "valve1/7"
+      ],
+      "rows": 1094,
+      "normal": 689,
+      "anomalous": 405,
+      "unknown": 0,
+      "raw_rows": 1094,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1094
+    },
+    {
+      "group": "valve2/0",
+      "sources": [
+        "valve2/0"
+      ],
+      "rows": 1125,
+      "normal": 731,
+      "anomalous": 394,
+      "unknown": 0,
+      "raw_rows": 1125,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1125
+    },
+    {
+      "group": "other/1",
+      "sources": [
+        "other/1"
+      ],
+      "rows": 745,
+      "normal": 557,
+      "anomalous": 188,
+      "unknown": 0,
+      "raw_rows": 745,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 745
+    },
+    {
+      "group": "other/10",
+      "sources": [
+        "other/10",
+        "other/11"
+      ],
+      "rows": 2496,
+      "normal": 1459,
+      "anomalous": 1037,
+      "unknown": 0,
+      "raw_rows": 2517,
+      "duplicate_rows": 21,
+      "ambiguous_rows": 0,
+      "unique_rows": 2496
+    },
+    {
+      "group": "other/7",
+      "sources": [
+        "other/7"
+      ],
+      "rows": 1090,
+      "normal": 743,
+      "anomalous": 347,
+      "unknown": 0,
+      "raw_rows": 1090,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1090
+    },
+    {
+      "group": "valve1/10",
+      "sources": [
+        "valve1/10"
+      ],
+      "rows": 1146,
+      "normal": 745,
+      "anomalous": 401,
+      "unknown": 0,
+      "raw_rows": 1146,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1146
+    },
+    {
+      "group": "valve1/11",
+      "sources": [
+        "valve1/11"
+      ],
+      "rows": 1141,
+      "normal": 742,
+      "anomalous": 399,
+      "unknown": 0,
+      "raw_rows": 1141,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1141
+    },
+    {
+      "group": "valve1/8",
+      "sources": [
+        "valve1/8"
+      ],
+      "rows": 1144,
+      "normal": 744,
+      "anomalous": 400,
+      "unknown": 0,
+      "raw_rows": 1144,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1144
+    },
+    {
+      "group": "valve1/9",
+      "sources": [
+        "valve1/9"
+      ],
+      "rows": 1148,
+      "normal": 746,
+      "anomalous": 402,
+      "unknown": 0,
+      "raw_rows": 1148,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1148
+    },
+    {
+      "group": "valve2/1",
+      "sources": [
+        "valve2/1"
+      ],
+      "rows": 1063,
+      "normal": 730,
+      "anomalous": 333,
+      "unknown": 0,
+      "raw_rows": 1063,
+      "duplicate_rows": 0,
+      "ambiguous_rows": 0,
+      "unique_rows": 1063
+    }
+  ],
+  "outer_folds": [
+    {
+      "fit_groups": [
+        "other/10",
+        "other/14",
+        "other/6",
+        "other/7",
+        "other/9",
+        "valve1/0",
+        "valve1/10",
+        "valve1/11",
+        "valve1/2",
+        "valve1/3",
+        "valve1/4",
+        "valve1/5",
+        "valve1/7",
+        "valve1/9",
+        "valve2/0",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "valve1/1",
+        "valve1/6",
+        "valve1/8"
+      ]
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/10",
+        "other/6",
+        "other/9",
+        "valve1/0",
+        "valve1/1",
+        "valve1/10",
+        "valve1/11",
+        "valve1/3",
+        "valve1/4",
+        "valve1/5",
+        "valve1/6",
+        "valve1/7",
+        "valve1/8",
+        "valve2/0",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "other/14",
+        "other/7",
+        "valve1/2",
+        "valve1/9"
+      ]
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/14",
+        "other/6",
+        "other/7",
+        "other/9",
+        "valve1/0",
+        "valve1/1",
+        "valve1/11",
+        "valve1/2",
+        "valve1/3",
+        "valve1/5",
+        "valve1/6",
+        "valve1/8",
+        "valve1/9",
+        "valve2/0",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "other/10",
+        "valve1/10",
+        "valve1/4",
+        "valve1/7"
+      ]
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/10",
+        "other/14",
+        "other/7",
+        "other/9",
+        "valve1/1",
+        "valve1/10",
+        "valve1/11",
+        "valve1/2",
+        "valve1/4",
+        "valve1/5",
+        "valve1/6",
+        "valve1/7",
+        "valve1/8",
+        "valve1/9",
+        "valve2/0"
+      ],
+      "assessment_groups": [
+        "other/6",
+        "valve1/0",
+        "valve1/3",
+        "valve2/1"
+      ]
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/10",
+        "other/14",
+        "other/6",
+        "other/7",
+        "valve1/0",
+        "valve1/1",
+        "valve1/10",
+        "valve1/2",
+        "valve1/3",
+        "valve1/4",
+        "valve1/6",
+        "valve1/7",
+        "valve1/8",
+        "valve1/9",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "other/9",
+        "valve1/11",
+        "valve1/5",
+        "valve2/0"
+      ]
+    }
+  ],
+  "provenance": {
+    "config_sha256": "e85d417c4cdaa4ff7530639b2775e5e1b5933c873769334fc4aac125703293e8",
+    "preserved_sha256": {
+      "models/active.json": "bb3726f79cb5eadeae9fbb79b3028491b0800c8914a1b4069dd1ae7ec9805d48",
+      "models/latest.json": "b298eaa5636917917af34cc5b476c15c34915d8b95f5ed1db5eb6e00a5e88f8a",
+      "data/skab-splits.json": "9bc9f9a6d015dbdc2c74259872a8e7aa3dce81f08c22878bf78c8f8b8cf30042",
+      "data/skab-inventory.json": "275d86b2521b2cf92767c1a0535370c6ce6ab12aa260588758f7bbf3729351f4",
+      "docs/evaluation-results.json": "ab6130095ba419a578a2b3dfb790e5703d5132dc9e40230c95955238f41dd526"
+    },
+    "sklearn_version": "1.9.1",
+    "source_sha256": {
+      "refinement.py": "26dacfc5a7e712aa38b7baed086937dd0e004ed2b5f2044168315b6daae2001b",
+      "generalization.py": "1f6b99d478ea6a743cdff68de4f3984b7bf8ab1d139d5ee2d386744a5c12f4c7",
+      "development.py": "8c0692eeb13f1402ea6db1583e8b409dd8a70a89cc6049eca0a515584df0b616",
+      "operating.py": "cdbc30be3b86fe56d3519fdc16fc679ea9e8f08d14d1a7922e71ea5332a1dab5",
+      "metrics.py": "286ff626109cd6726f70990bef61738c5fc0f9d57904f4e9792e697ff3423cc5"
+    }
+  },
+  "fold_results": [
+    {
+      "fit_groups": [
+        "other/10",
+        "other/14",
+        "other/6",
+        "other/7",
+        "other/9",
+        "valve1/0",
+        "valve1/10",
+        "valve1/11",
+        "valve1/2",
+        "valve1/3",
+        "valve1/4",
+        "valve1/5",
+        "valve1/7",
+        "valve1/9",
+        "valve2/0",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "valve1/1",
+        "valve1/6",
+        "valve1/8"
+      ],
+      "selection": {
+        "current_hgb": {
+          "threshold": 0.007588344992763086,
+          "policy": {
+            "persistence": 3,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 6029,
+            "fp": 9973,
+            "fn": 688,
+            "tn": 2428,
+            "precision": 0.37676540432445943,
+            "recall": 0.8975733214232544,
+            "f1": 0.5307451912496148,
+            "fpr_available_normal": 0.8746711103315208,
+            "fpr_all_normal": 0.8042093379566164,
+            "false_alarm_onsets": 132,
+            "false_onsets_per_available_normal_hour": 41.67689878968602,
+            "events": 19,
+            "detected_events": 9,
+            "event_recall": 0.47368421052631576,
+            "minimum_group_recall": 0.1986754966887417,
+            "group_recalls": {
+              "other/14": 0.1986754966887417,
+              "other/6": 1.0,
+              "other/9": 1.0,
+              "valve1/0": 0.9925187032418953,
+              "valve1/2": 0.9940652818991098,
+              "valve1/3": 1.0,
+              "valve1/4": 0.994269340974212,
+              "valve1/5": 1.0,
+              "valve1/7": 1.0,
+              "valve2/0": 1.0,
+              "other/10": 0.6316297010607522,
+              "other/7": 1.0,
+              "valve1/10": 1.0,
+              "valve1/11": 0.9774436090225563,
+              "valve1/9": 0.8855721393034826,
+              "valve2/1": 0.993993993993994
+            },
+            "available_normal_rows": 11402,
+            "unavailable_rows": 999,
+            "unavailable_anomaly_rows": 0
+          },
+          "feasible": false,
+          "status": "recall_constraints_unmet"
+        },
+        "median15_hgb": {
+          "threshold": 0.00979358037401371,
+          "policy": {
+            "persistence": 5,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5943,
+            "fp": 9631,
+            "fn": 774,
+            "tn": 2770,
+            "precision": 0.38159753435212534,
+            "recall": 0.8847699866011612,
+            "f1": 0.5332196850746939,
+            "fpr_available_normal": 0.8637668161434977,
+            "fpr_all_normal": 0.7766309168615434,
+            "false_alarm_onsets": 53,
+            "false_onsets_per_available_normal_hour": 17.112107623318384,
+            "events": 19,
+            "detected_events": 7,
+            "event_recall": 0.3684210526315789,
+            "minimum_group_recall": 0.13245033112582782,
+            "group_recalls": {
+              "other/14": 0.13245033112582782,
+              "other/6": 1.0,
+              "other/9": 1.0,
+              "valve1/0": 1.0,
+              "valve1/2": 0.9465875370919882,
+              "valve1/3": 1.0,
+              "valve1/4": 0.9484240687679083,
+              "valve1/5": 1.0,
+              "valve1/7": 1.0,
+              "valve2/0": 1.0,
+              "other/10": 0.6345226615236258,
+              "other/7": 1.0,
+              "valve1/10": 1.0,
+              "valve1/11": 0.9398496240601504,
+              "valve1/9": 0.8631840796019901,
+              "valve2/1": 0.9459459459459459
+            },
+            "available_normal_rows": 11150,
+            "unavailable_rows": 1293,
+            "unavailable_anomaly_rows": 42
+          },
+          "feasible": false,
+          "status": "recall_constraints_unmet"
+        }
+      },
+      "fit_audit": {
+        "fit_rows": 18119,
+        "positive_training_targets": 6717,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative",
+        "fit_groups": [
+          "other/10",
+          "other/14",
+          "other/6",
+          "other/7",
+          "other/9",
+          "valve1/0",
+          "valve1/10",
+          "valve1/11",
+          "valve1/2",
+          "valve1/3",
+          "valve1/4",
+          "valve1/5",
+          "valve1/7",
+          "valve1/9",
+          "valve2/0",
+          "valve2/1"
+        ],
+        "fit_sources": [
+          "other/14",
+          "other/6",
+          "other/9",
+          "valve1/0",
+          "valve1/2",
+          "valve1/3",
+          "valve1/4",
+          "valve1/5",
+          "valve1/7",
+          "valve2/0",
+          "other/10",
+          "other/11",
+          "other/7",
+          "valve1/10",
+          "valve1/11",
+          "valve1/9",
+          "valve2/1"
+        ],
+        "normal_scaling_rows": 12401,
+        "center": [
+          0.0277655,
+          0.0411245,
+          1.20272,
+          0.054711,
+          71.1686,
+          25.4794,
+          230.028,
+          32.0364
+        ],
+        "scale": [
+          0.0013021675799999978,
+          0.00252649866,
+          0.6410628965999999,
+          0.24308895478131948,
+          4.222444799999998,
+          1.1232177599999948,
+          9.165433199999981,
+          1.3722945600000043
+        ]
+      },
+      "procedures": {
+        "current_hgb": {
+          "pooled": {
+            "tp": 1805,
+            "fp": 11946,
+            "fn": 0,
+            "tn": 425,
+            "events": 5,
+            "detected_events": 0,
+            "false_alarm_onsets": 22,
+            "available_normal_rows": 12071,
+            "unavailable_rows": 300,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.13126318085957384,
+            "recall": 1.0,
+            "f1": 0.23206479814862432,
+            "fpr_available_normal": 0.9896446027669621,
+            "fpr_all_normal": 0.9656454611591626,
+            "false_onsets_per_available_normal_hour": 6.561179686852787,
+            "event_recall": 0.0,
+            "macro_group_precision": 0.2857604148006225,
+            "macro_group_recall": 1.0,
+            "minimum_group_recall": 1.0,
+            "median_detected_event_delay_seconds": null,
+            "alerted_readings": 13751
+          },
+          "per_group": {
+            "anomaly-free/anomaly-free": {
+              "tp": 410,
+              "fp": 9401,
+              "fn": 0,
+              "tn": 177,
+              "precision": 0.04178982774436857,
+              "recall": 1.0,
+              "f1": 0.0802269836610899,
+              "fpr_available_normal": 0.9877075015759613,
+              "fpr_all_normal": 0.9815201503445395,
+              "false_alarm_onsets": 18,
+              "false_onsets_per_available_normal_hour": 6.808152973313722,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "anomaly-free/anomaly-free": 1.0
+              },
+              "available_normal_rows": 9518,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/1": {
+              "tp": 402,
+              "fp": 681,
+              "fn": 0,
+              "tn": 62,
+              "precision": 0.37119113573407203,
+              "recall": 1.0,
+              "f1": 0.5414141414141415,
+              "fpr_available_normal": 0.9970717423133236,
+              "fpr_all_normal": 0.9165545087483177,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.27086383601757,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/1": 1.0
+              },
+              "available_normal_rows": 683,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/6": {
+              "tp": 405,
+              "fp": 687,
+              "fn": 0,
+              "tn": 62,
+              "precision": 0.3708791208791209,
+              "recall": 1.0,
+              "f1": 0.5410821643286573,
+              "fpr_available_normal": 0.9970972423802612,
+              "fpr_all_normal": 0.9172229639519359,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.2249637155297535,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/6": 1.0
+              },
+              "available_normal_rows": 689,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "other/1": {
+              "tp": 188,
+              "fp": 495,
+              "fn": 0,
+              "tn": 62,
+              "precision": 0.2752562225475842,
+              "recall": 1.0,
+              "f1": 0.4316877152698048,
+              "fpr_available_normal": 0.9959758551307847,
+              "fpr_all_normal": 0.8886894075403949,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 7.2434607645875255,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "other/1": 1.0
+              },
+              "available_normal_rows": 497,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/8": {
+              "tp": 400,
+              "fp": 682,
+              "fn": 0,
+              "tn": 62,
+              "precision": 0.36968576709796674,
+              "recall": 1.0,
+              "f1": 0.5398110661268556,
+              "fpr_available_normal": 0.9970760233918129,
+              "fpr_all_normal": 0.9166666666666666,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.2631578947368425,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/8": 1.0
+              },
+              "available_normal_rows": 684,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            }
+          }
+        },
+        "median15_hgb": {
+          "pooled": {
+            "tp": 1805,
+            "fp": 11891,
+            "fn": 0,
+            "tn": 480,
+            "events": 5,
+            "detected_events": 0,
+            "false_alarm_onsets": 10,
+            "available_normal_rows": 12001,
+            "unavailable_rows": 370,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.13179030373831777,
+            "recall": 1.0,
+            "f1": 0.2328882007612412,
+            "fpr_available_normal": 0.9908340971585701,
+            "fpr_all_normal": 0.961199579662113,
+            "false_onsets_per_available_normal_hour": 2.999750020831597,
+            "event_recall": 0.0,
+            "macro_group_precision": 0.29039928698709444,
+            "macro_group_recall": 1.0,
+            "minimum_group_recall": 1.0,
+            "median_detected_event_delay_seconds": null,
+            "alerted_readings": 13696
+          },
+          "per_group": {
+            "anomaly-free/anomaly-free": {
+              "tp": 410,
+              "fp": 9410,
+              "fn": 0,
+              "tn": 168,
+              "precision": 0.04175152749490835,
+              "recall": 1.0,
+              "f1": 0.0801564027370479,
+              "fpr_available_normal": 0.9901094276094277,
+              "fpr_all_normal": 0.9824598037168512,
+              "false_alarm_onsets": 6,
+              "false_onsets_per_available_normal_hour": 2.2727272727272725,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "anomaly-free/anomaly-free": 1.0
+              },
+              "available_normal_rows": 9504,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/1": {
+              "tp": 402,
+              "fp": 665,
+              "fn": 0,
+              "tn": 78,
+              "precision": 0.3767572633552015,
+              "recall": 1.0,
+              "f1": 0.5473110959836623,
+              "fpr_available_normal": 0.9940209267563528,
+              "fpr_all_normal": 0.8950201884253028,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.381165919282512,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/1": 1.0
+              },
+              "available_normal_rows": 669,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/6": {
+              "tp": 405,
+              "fp": 671,
+              "fn": 0,
+              "tn": 78,
+              "precision": 0.3763940520446097,
+              "recall": 1.0,
+              "f1": 0.5469277515192438,
+              "fpr_available_normal": 0.9940740740740741,
+              "fpr_all_normal": 0.8958611481975968,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.333333333333333,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/6": 1.0
+              },
+              "available_normal_rows": 675,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "other/1": {
+              "tp": 188,
+              "fp": 479,
+              "fn": 0,
+              "tn": 78,
+              "precision": 0.2818590704647676,
+              "recall": 1.0,
+              "f1": 0.439766081871345,
+              "fpr_available_normal": 0.9917184265010351,
+              "fpr_all_normal": 0.8599640933572711,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 7.453416149068324,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "other/1": 1.0
+              },
+              "available_normal_rows": 483,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/8": {
+              "tp": 400,
+              "fp": 666,
+              "fn": 0,
+              "tn": 78,
+              "precision": 0.37523452157598497,
+              "recall": 1.0,
+              "f1": 0.5457025920873124,
+              "fpr_available_normal": 0.9940298507462687,
+              "fpr_all_normal": 0.8951612903225806,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.3731343283582085,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/8": 1.0
+              },
+              "available_normal_rows": 670,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            }
+          }
+        }
+      },
+      "fit_seconds": 2.8402233000088017,
+      "paired_score_seconds": 0.39338300000235904,
+      "raw_score_seconds": 0.23342839996621478,
+      "median_seconds": 0.05984820000594482,
+      "elapsed_seconds": 17.95785399999295
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/10",
+        "other/6",
+        "other/9",
+        "valve1/0",
+        "valve1/1",
+        "valve1/10",
+        "valve1/11",
+        "valve1/3",
+        "valve1/4",
+        "valve1/5",
+        "valve1/6",
+        "valve1/7",
+        "valve1/8",
+        "valve2/0",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "other/14",
+        "other/7",
+        "valve1/2",
+        "valve1/9"
+      ],
+      "selection": {
+        "current_hgb": {
+          "threshold": 0.05225804226263701,
+          "policy": {
+            "persistence": 3,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5759,
+            "fp": 7861,
+            "fn": 1375,
+            "tn": 14081,
+            "precision": 0.42283406754772396,
+            "recall": 0.8072610036445192,
+            "f1": 0.55497735376313,
+            "fpr_available_normal": 0.3764305894746923,
+            "fpr_all_normal": 0.3582626925530945,
+            "false_alarm_onsets": 653,
+            "false_onsets_per_available_normal_hour": 112.5700330412297,
+            "events": 20,
+            "detected_events": 18,
+            "event_recall": 0.9,
+            "minimum_group_recall": 0.2034715525554484,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 1.0,
+              "other/6": 0.9875621890547264,
+              "other/9": 0.9950124688279302,
+              "valve1/0": 0.571072319201995,
+              "valve1/1": 0.9850746268656716,
+              "valve1/3": 0.9282178217821783,
+              "valve1/4": 0.994269340974212,
+              "valve1/5": 0.9851116625310173,
+              "valve1/6": 0.9358024691358025,
+              "valve1/7": 0.9925925925925926,
+              "valve2/0": 0.7182741116751269,
+              "other/1": 0.824468085106383,
+              "other/10": 0.2034715525554484,
+              "valve1/10": 0.9376558603491272,
+              "valve1/11": 0.7769423558897243,
+              "valve1/8": 0.99,
+              "valve2/1": 0.8918918918918919
+            },
+            "available_normal_rows": 20883,
+            "unavailable_rows": 1059,
+            "unavailable_anomaly_rows": 0
+          },
+          "feasible": true,
+          "status": "recall_feasible"
+        },
+        "median15_hgb": {
+          "threshold": 0.06357363199280566,
+          "policy": {
+            "persistence": 5,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5816,
+            "fp": 8020,
+            "fn": 1318,
+            "tn": 13922,
+            "precision": 0.4203527030933796,
+            "recall": 0.815250911129801,
+            "f1": 0.5546971864568431,
+            "fpr_available_normal": 0.38899936945239366,
+            "fpr_all_normal": 0.36550906936468874,
+            "false_alarm_onsets": 167,
+            "false_onsets_per_available_normal_hour": 29.16040161032158,
+            "events": 20,
+            "detected_events": 14,
+            "event_recall": 0.7,
+            "minimum_group_recall": 0.20250723240115717,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 0.975609756097561,
+              "other/6": 0.9776119402985075,
+              "other/9": 1.0,
+              "valve1/0": 0.7680798004987531,
+              "valve1/1": 1.0,
+              "valve1/3": 0.9306930693069307,
+              "valve1/4": 0.9484240687679083,
+              "valve1/5": 1.0,
+              "valve1/6": 0.8592592592592593,
+              "valve1/7": 1.0,
+              "valve2/0": 0.850253807106599,
+              "other/1": 0.776595744680851,
+              "other/10": 0.20250723240115717,
+              "valve1/10": 0.9301745635910225,
+              "valve1/11": 0.7719298245614035,
+              "valve1/8": 1.0,
+              "valve2/1": 0.8318318318318318
+            },
+            "available_normal_rows": 20617,
+            "unavailable_rows": 1353,
+            "unavailable_anomaly_rows": 28
+          },
+          "feasible": true,
+          "status": "recall_feasible"
+        }
+      },
+      "fit_audit": {
+        "fit_rows": 28017,
+        "positive_training_targets": 7134,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative",
+        "fit_groups": [
+          "anomaly-free/anomaly-free",
+          "other/1",
+          "other/10",
+          "other/6",
+          "other/9",
+          "valve1/0",
+          "valve1/1",
+          "valve1/10",
+          "valve1/11",
+          "valve1/3",
+          "valve1/4",
+          "valve1/5",
+          "valve1/6",
+          "valve1/7",
+          "valve1/8",
+          "valve2/0",
+          "valve2/1"
+        ],
+        "fit_sources": [
+          "anomaly-free/anomaly-free",
+          "other/5",
+          "other/6",
+          "other/9",
+          "valve1/0",
+          "valve1/1",
+          "valve1/3",
+          "valve1/4",
+          "valve1/5",
+          "valve1/6",
+          "valve1/7",
+          "valve2/0",
+          "other/1",
+          "other/10",
+          "other/11",
+          "valve1/10",
+          "valve1/11",
+          "valve1/8",
+          "valve2/1"
+        ],
+        "normal_scaling_rows": 21942,
+        "center": [
+          0.20863949999999998,
+          0.263863,
+          1.87108,
+          0.054711,
+          88.044,
+          27.600450000000002,
+          229.597,
+          123.335
+        ],
+        "scale": [
+          0.03507535080000004,
+          0.019975811099999956,
+          1.1257159410000002,
+          0.24308895478131948,
+          3.7103547600000013,
+          2.6788358100000034,
+          9.198791699999994,
+          5.960052000000015
+        ]
+      },
+      "procedures": {
+        "current_hgb": {
+          "pooled": {
+            "tp": 1246,
+            "fp": 532,
+            "fn": 142,
+            "tn": 2298,
+            "events": 4,
+            "detected_events": 4,
+            "false_alarm_onsets": 47,
+            "available_normal_rows": 2590,
+            "unavailable_rows": 240,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.7007874015748031,
+            "recall": 0.8976945244956772,
+            "f1": 0.7871130764371447,
+            "fpr_available_normal": 0.20540540540540542,
+            "fpr_all_normal": 0.1879858657243816,
+            "false_onsets_per_available_normal_hour": 65.32818532818533,
+            "event_recall": 1.0,
+            "macro_group_precision": 0.711134193093455,
+            "macro_group_recall": 0.9003563476895909,
+            "minimum_group_recall": 0.798219584569733,
+            "median_detected_event_delay_seconds": 4.5,
+            "alerted_readings": 1778
+          },
+          "per_group": {
+            "other/14": {
+              "tp": 288,
+              "fp": 53,
+              "fn": 14,
+              "tn": 550,
+              "precision": 0.844574780058651,
+              "recall": 0.9536423841059603,
+              "f1": 0.895800933125972,
+              "fpr_available_normal": 0.09760589318600368,
+              "fpr_all_normal": 0.087893864013267,
+              "false_alarm_onsets": 7,
+              "false_onsets_per_available_normal_hour": 46.40883977900552,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9536423841059603,
+              "group_recalls": {
+                "other/14": 0.9536423841059603
+              },
+              "available_normal_rows": 543,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                6.0
+              ]
+            },
+            "valve1/2": {
+              "tp": 269,
+              "fp": 180,
+              "fn": 68,
+              "tn": 558,
+              "precision": 0.5991091314031181,
+              "recall": 0.798219584569733,
+              "f1": 0.6844783715012722,
+              "fpr_available_normal": 0.26548672566371684,
+              "fpr_all_normal": 0.24390243902439024,
+              "false_alarm_onsets": 20,
+              "false_onsets_per_available_normal_hour": 106.19469026548673,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.798219584569733,
+              "group_recalls": {
+                "valve1/2": 0.798219584569733
+              },
+              "available_normal_rows": 678,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                3.0
+              ]
+            },
+            "other/7": {
+              "tp": 344,
+              "fp": 117,
+              "fn": 3,
+              "tn": 626,
+              "precision": 0.7462039045553145,
+              "recall": 0.9913544668587896,
+              "f1": 0.8514851485148515,
+              "fpr_available_normal": 0.17130307467057102,
+              "fpr_all_normal": 0.15746971736204576,
+              "false_alarm_onsets": 3,
+              "false_onsets_per_available_normal_hour": 15.81259150805271,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9913544668587896,
+              "group_recalls": {
+                "other/7": 0.9913544668587896
+              },
+              "available_normal_rows": 683,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                3.0
+              ]
+            },
+            "valve1/9": {
+              "tp": 345,
+              "fp": 182,
+              "fn": 57,
+              "tn": 564,
+              "precision": 0.6546489563567363,
+              "recall": 0.8582089552238806,
+              "f1": 0.7427341227125942,
+              "fpr_available_normal": 0.2653061224489796,
+              "fpr_all_normal": 0.24396782841823056,
+              "false_alarm_onsets": 17,
+              "false_onsets_per_available_normal_hour": 89.21282798833819,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8582089552238806,
+              "group_recalls": {
+                "valve1/9": 0.8582089552238806
+              },
+              "available_normal_rows": 686,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                35.0
+              ]
+            }
+          }
+        },
+        "median15_hgb": {
+          "pooled": {
+            "tp": 1249,
+            "fp": 491,
+            "fn": 139,
+            "tn": 2339,
+            "events": 4,
+            "detected_events": 4,
+            "false_alarm_onsets": 12,
+            "available_normal_rows": 2534,
+            "unavailable_rows": 310,
+            "unavailable_anomaly_rows": 14,
+            "precision": 0.717816091954023,
+            "recall": 0.8998559077809798,
+            "f1": 0.7985933503836317,
+            "fpr_available_normal": 0.19376479873717442,
+            "fpr_all_normal": 0.1734982332155477,
+            "false_onsets_per_available_normal_hour": 17.048145224940804,
+            "event_recall": 1.0,
+            "macro_group_precision": 0.7242509989538852,
+            "macro_group_recall": 0.9022710218843796,
+            "minimum_group_recall": 0.8545994065281899,
+            "median_detected_event_delay_seconds": 20.5,
+            "alerted_readings": 1740
+          },
+          "per_group": {
+            "other/14": {
+              "tp": 281,
+              "fp": 61,
+              "fn": 21,
+              "tn": 542,
+              "precision": 0.8216374269005848,
+              "recall": 0.9304635761589404,
+              "f1": 0.8726708074534162,
+              "fpr_available_normal": 0.11531190926275993,
+              "fpr_all_normal": 0.1011608623548922,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 6.805293005671078,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9304635761589404,
+              "group_recalls": {
+                "other/14": 0.9304635761589404
+              },
+              "available_normal_rows": 529,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                22.0
+              ]
+            },
+            "valve1/2": {
+              "tp": 288,
+              "fp": 152,
+              "fn": 49,
+              "tn": 586,
+              "precision": 0.6545454545454545,
+              "recall": 0.8545994065281899,
+              "f1": 0.7413127413127413,
+              "fpr_available_normal": 0.2289156626506024,
+              "fpr_all_normal": 0.20596205962059622,
+              "false_alarm_onsets": 6,
+              "false_onsets_per_available_normal_hour": 32.53012048192771,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8545994065281899,
+              "group_recalls": {
+                "valve1/2": 0.8545994065281899
+              },
+              "available_normal_rows": 664,
+              "unavailable_rows": 88,
+              "unavailable_anomaly_rows": 14,
+              "detected_event_delays_seconds": [
+                19.0
+              ]
+            },
+            "other/7": {
+              "tp": 336,
+              "fp": 126,
+              "fn": 11,
+              "tn": 617,
+              "precision": 0.7272727272727273,
+              "recall": 0.968299711815562,
+              "f1": 0.830655129789864,
+              "fpr_available_normal": 0.18834080717488788,
+              "fpr_all_normal": 0.1695827725437416,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.381165919282512,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.968299711815562,
+              "group_recalls": {
+                "other/7": 0.968299711815562
+              },
+              "available_normal_rows": 669,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                11.0
+              ]
+            },
+            "valve1/9": {
+              "tp": 344,
+              "fp": 152,
+              "fn": 58,
+              "tn": 594,
+              "precision": 0.6935483870967742,
+              "recall": 0.8557213930348259,
+              "f1": 0.7661469933184856,
+              "fpr_available_normal": 0.2261904761904762,
+              "fpr_all_normal": 0.2037533512064343,
+              "false_alarm_onsets": 4,
+              "false_onsets_per_available_normal_hour": 21.428571428571427,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8557213930348259,
+              "group_recalls": {
+                "valve1/9": 0.8557213930348259
+              },
+              "available_normal_rows": 672,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                43.0
+              ]
+            }
+          }
+        }
+      },
+      "fit_seconds": 3.6727622999896994,
+      "paired_score_seconds": 0.12410729999828618,
+      "raw_score_seconds": 0.06496750000223983,
+      "median_seconds": 0.027467200008686632,
+      "elapsed_seconds": 21.40758729999652
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/14",
+        "other/6",
+        "other/7",
+        "other/9",
+        "valve1/0",
+        "valve1/1",
+        "valve1/11",
+        "valve1/2",
+        "valve1/3",
+        "valve1/5",
+        "valve1/6",
+        "valve1/8",
+        "valve1/9",
+        "valve2/0",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "other/10",
+        "valve1/10",
+        "valve1/4",
+        "valve1/7"
+      ],
+      "selection": {
+        "current_hgb": {
+          "threshold": 0.0025397089818396477,
+          "policy": {
+            "persistence": 3,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 6050,
+            "fp": 19246,
+            "fn": 280,
+            "tn": 1887,
+            "precision": 0.23916824794433902,
+            "recall": 0.9557661927330173,
+            "f1": 0.38259659773604,
+            "fpr_available_normal": 0.9568935514343957,
+            "fpr_all_normal": 0.9107083707944921,
+            "false_alarm_onsets": 69,
+            "false_onsets_per_available_normal_hour": 12.350221249937851,
+            "events": 18,
+            "detected_events": 5,
+            "event_recall": 0.2777777777777778,
+            "minimum_group_recall": 0.09602649006622517,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 1.0,
+              "other/14": 0.09602649006622517,
+              "other/6": 1.0,
+              "other/9": 1.0,
+              "valve1/0": 1.0,
+              "valve1/1": 1.0,
+              "valve1/2": 0.9940652818991098,
+              "valve1/3": 1.0,
+              "valve1/5": 1.0,
+              "valve1/6": 1.0,
+              "valve2/0": 1.0,
+              "other/1": 1.0,
+              "other/7": 1.0,
+              "valve1/11": 0.9924812030075187,
+              "valve1/8": 1.0,
+              "valve1/9": 1.0,
+              "valve2/1": 0.993993993993994
+            },
+            "available_normal_rows": 20113,
+            "unavailable_rows": 1020,
+            "unavailable_anomaly_rows": 0
+          },
+          "feasible": false,
+          "status": "recall_constraints_unmet"
+        },
+        "median15_hgb": {
+          "threshold": 0.0016946196141643492,
+          "policy": {
+            "persistence": 5,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 6171,
+            "fp": 19577,
+            "fn": 159,
+            "tn": 1556,
+            "precision": 0.2396691005126612,
+            "recall": 0.9748815165876777,
+            "f1": 0.3847496726728599,
+            "fpr_available_normal": 0.9850062893081761,
+            "fpr_all_normal": 0.9263710784081768,
+            "false_alarm_onsets": 32,
+            "false_onsets_per_available_normal_hour": 5.79622641509434,
+            "events": 18,
+            "detected_events": 3,
+            "event_recall": 0.16666666666666666,
+            "minimum_group_recall": 0.5927152317880795,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 1.0,
+              "other/14": 0.5927152317880795,
+              "other/6": 1.0,
+              "other/9": 1.0,
+              "valve1/0": 1.0,
+              "valve1/1": 1.0,
+              "valve1/2": 0.9465875370919882,
+              "valve1/3": 1.0,
+              "valve1/5": 1.0,
+              "valve1/6": 1.0,
+              "valve2/0": 1.0,
+              "other/1": 1.0,
+              "other/7": 1.0,
+              "valve1/11": 1.0,
+              "valve1/8": 1.0,
+              "valve1/9": 1.0,
+              "valve2/1": 0.9459459459459459
+            },
+            "available_normal_rows": 19875,
+            "unavailable_rows": 1286,
+            "unavailable_anomaly_rows": 28
+          },
+          "feasible": false,
+          "status": "recall_constraints_unmet"
+        }
+      },
+      "fit_audit": {
+        "fit_rows": 26443,
+        "positive_training_targets": 6330,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative",
+        "fit_groups": [
+          "anomaly-free/anomaly-free",
+          "other/1",
+          "other/14",
+          "other/6",
+          "other/7",
+          "other/9",
+          "valve1/0",
+          "valve1/1",
+          "valve1/11",
+          "valve1/2",
+          "valve1/3",
+          "valve1/5",
+          "valve1/6",
+          "valve1/8",
+          "valve1/9",
+          "valve2/0",
+          "valve2/1"
+        ],
+        "fit_sources": [
+          "anomaly-free/anomaly-free",
+          "other/14",
+          "other/5",
+          "other/6",
+          "other/9",
+          "valve1/0",
+          "valve1/1",
+          "valve1/2",
+          "valve1/3",
+          "valve1/5",
+          "valve1/6",
+          "valve2/0",
+          "other/1",
+          "other/7",
+          "valve1/11",
+          "valve1/8",
+          "valve1/9",
+          "valve2/1"
+        ],
+        "normal_scaling_rows": 21133,
+        "center": [
+          0.209357,
+          0.26342,
+          1.91416,
+          0.054711,
+          88.5453,
+          27.7415,
+          229.604,
+          123.666
+        ],
+        "scale": [
+          0.015500583000000028,
+          0.01620185279999999,
+          1.108080414,
+          0.24308895478131948,
+          2.722498380000012,
+          2.5825409399999963,
+          9.153572400000009,
+          4.942988400000004
+        ]
+      },
+      "procedures": {
+        "current_hgb": {
+          "pooled": {
+            "tp": 2190,
+            "fp": 3348,
+            "fn": 2,
+            "tn": 291,
+            "events": 6,
+            "detected_events": 1,
+            "false_alarm_onsets": 6,
+            "available_normal_rows": 3360,
+            "unavailable_rows": 279,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.39544962080173346,
+            "recall": 0.9990875912408759,
+            "f1": 0.5666235446313066,
+            "fpr_available_normal": 0.9964285714285714,
+            "fpr_all_normal": 0.920032976092333,
+            "false_onsets_per_available_normal_hour": 6.428571428571429,
+            "event_recall": 0.16666666666666666,
+            "macro_group_precision": 0.3832609464890732,
+            "macro_group_recall": 0.998567335243553,
+            "minimum_group_recall": 0.994269340974212,
+            "median_detected_event_delay_seconds": 2.0,
+            "alerted_readings": 5538
+          },
+          "per_group": {
+            "valve1/4": {
+              "tp": 347,
+              "fp": 684,
+              "fn": 2,
+              "tn": 62,
+              "precision": 0.33656644034917554,
+              "recall": 0.994269340974212,
+              "f1": 0.5028985507246376,
+              "fpr_available_normal": 0.9970845481049563,
+              "fpr_all_normal": 0.9168900804289544,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.247813411078717,
+              "events": 2,
+              "detected_events": 1,
+              "event_recall": 0.5,
+              "minimum_group_recall": 0.994269340974212,
+              "group_recalls": {
+                "valve1/4": 0.994269340974212
+              },
+              "available_normal_rows": 686,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                2.0
+              ]
+            },
+            "valve1/7": {
+              "tp": 405,
+              "fp": 625,
+              "fn": 0,
+              "tn": 64,
+              "precision": 0.3932038834951456,
+              "recall": 1.0,
+              "f1": 0.5644599303135889,
+              "fpr_available_normal": 0.9936406995230525,
+              "fpr_all_normal": 0.9071117561683599,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 11.446740858505564,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/7": 1.0
+              },
+              "available_normal_rows": 629,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "other/10": {
+              "tp": 1037,
+              "fp": 1356,
+              "fn": 0,
+              "tn": 103,
+              "precision": 0.4333472628499791,
+              "recall": 1.0,
+              "f1": 0.60466472303207,
+              "fpr_available_normal": 0.9970588235294118,
+              "fpr_all_normal": 0.9294037011651817,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 5.294117647058823,
+              "events": 2,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "other/10": 1.0
+              },
+              "available_normal_rows": 1360,
+              "unavailable_rows": 99,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/10": {
+              "tp": 401,
+              "fp": 683,
+              "fn": 0,
+              "tn": 62,
+              "precision": 0.3699261992619926,
+              "recall": 1.0,
+              "f1": 0.54006734006734,
+              "fpr_available_normal": 0.997080291970803,
+              "fpr_all_normal": 0.9167785234899329,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.255474452554745,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/10": 1.0
+              },
+              "available_normal_rows": 685,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            }
+          }
+        },
+        "median15_hgb": {
+          "pooled": {
+            "tp": 2174,
+            "fp": 3252,
+            "fn": 18,
+            "tn": 387,
+            "events": 6,
+            "detected_events": 1,
+            "false_alarm_onsets": 6,
+            "available_normal_rows": 3276,
+            "unavailable_rows": 377,
+            "unavailable_anomaly_rows": 14,
+            "precision": 0.4006634721710284,
+            "recall": 0.9917883211678832,
+            "f1": 0.5707534786033079,
+            "fpr_available_normal": 0.9926739926739927,
+            "fpr_all_normal": 0.8936521022258862,
+            "false_onsets_per_available_normal_hour": 6.593406593406593,
+            "event_recall": 0.16666666666666666,
+            "macro_group_precision": 0.38795794714494863,
+            "macro_group_recall": 0.9871060171919771,
+            "minimum_group_recall": 0.9484240687679083,
+            "median_detected_event_delay_seconds": 19.0,
+            "alerted_readings": 5426
+          },
+          "per_group": {
+            "valve1/4": {
+              "tp": 331,
+              "fp": 668,
+              "fn": 18,
+              "tn": 78,
+              "precision": 0.33133133133133136,
+              "recall": 0.9484240687679083,
+              "f1": 0.4910979228486647,
+              "fpr_available_normal": 0.9940476190476191,
+              "fpr_all_normal": 0.8954423592493298,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.357142857142857,
+              "events": 2,
+              "detected_events": 1,
+              "event_recall": 0.5,
+              "minimum_group_recall": 0.9484240687679083,
+              "group_recalls": {
+                "valve1/4": 0.9484240687679083
+              },
+              "available_normal_rows": 672,
+              "unavailable_rows": 88,
+              "unavailable_anomaly_rows": 14,
+              "detected_event_delays_seconds": [
+                19.0
+              ]
+            },
+            "valve1/7": {
+              "tp": 405,
+              "fp": 593,
+              "fn": 0,
+              "tn": 96,
+              "precision": 0.405811623246493,
+              "recall": 1.0,
+              "f1": 0.5773342836778332,
+              "fpr_available_normal": 0.9866888519134775,
+              "fpr_all_normal": 0.8606676342525399,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 11.980033277870216,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/7": 1.0
+              },
+              "available_normal_rows": 601,
+              "unavailable_rows": 88,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "other/10": {
+              "tp": 1037,
+              "fp": 1324,
+              "fn": 0,
+              "tn": 135,
+              "precision": 0.4392206692079627,
+              "recall": 1.0,
+              "f1": 0.6103590347263096,
+              "fpr_available_normal": 0.993993993993994,
+              "fpr_all_normal": 0.9074708704592186,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 5.405405405405405,
+              "events": 2,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "other/10": 1.0
+              },
+              "available_normal_rows": 1332,
+              "unavailable_rows": 127,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            },
+            "valve1/10": {
+              "tp": 401,
+              "fp": 667,
+              "fn": 0,
+              "tn": 78,
+              "precision": 0.37546816479400746,
+              "recall": 1.0,
+              "f1": 0.5459496255956433,
+              "fpr_available_normal": 0.9940387481371088,
+              "fpr_all_normal": 0.8953020134228188,
+              "false_alarm_onsets": 1,
+              "false_onsets_per_available_normal_hour": 5.365126676602086,
+              "events": 1,
+              "detected_events": 0,
+              "event_recall": 0.0,
+              "minimum_group_recall": 1.0,
+              "group_recalls": {
+                "valve1/10": 1.0
+              },
+              "available_normal_rows": 671,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": []
+            }
+          }
+        }
+      },
+      "fit_seconds": 4.130358900001738,
+      "paired_score_seconds": 0.17178679999778979,
+      "raw_score_seconds": 0.09282740000344347,
+      "median_seconds": 0.04148430000350345,
+      "elapsed_seconds": 22.8924321999948
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/10",
+        "other/14",
+        "other/7",
+        "other/9",
+        "valve1/1",
+        "valve1/10",
+        "valve1/11",
+        "valve1/2",
+        "valve1/4",
+        "valve1/5",
+        "valve1/6",
+        "valve1/7",
+        "valve1/8",
+        "valve1/9",
+        "valve2/0"
+      ],
+      "assessment_groups": [
+        "other/6",
+        "valve1/0",
+        "valve1/3",
+        "valve2/1"
+      ],
+      "selection": {
+        "current_hgb": {
+          "threshold": 0.13315617562645962,
+          "policy": {
+            "persistence": 3,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5597,
+            "fp": 8296,
+            "fn": 1385,
+            "tn": 13511,
+            "precision": 0.4028647520333981,
+            "recall": 0.8016327699799485,
+            "f1": 0.5362395209580838,
+            "fpr_available_normal": 0.3998457682668209,
+            "fpr_all_normal": 0.38042830283853807,
+            "false_alarm_onsets": 312,
+            "false_onsets_per_available_normal_hour": 54.13533834586466,
+            "events": 19,
+            "detected_events": 17,
+            "event_recall": 0.8947368421052632,
+            "minimum_group_recall": 0.20178041543026706,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 1.0,
+              "other/14": 0.9503311258278145,
+              "other/9": 0.9900249376558603,
+              "valve1/1": 0.9601990049751243,
+              "valve1/2": 0.20178041543026706,
+              "valve1/4": 0.994269340974212,
+              "valve1/5": 0.8660049627791563,
+              "valve1/6": 0.908641975308642,
+              "valve1/7": 0.9555555555555556,
+              "valve2/0": 0.7360406091370558,
+              "other/1": 0.8085106382978723,
+              "other/10": 0.4156219864995178,
+              "other/7": 0.9913544668587896,
+              "valve1/10": 0.8379052369077307,
+              "valve1/11": 0.7719298245614035,
+              "valve1/8": 0.9875,
+              "valve1/9": 0.8507462686567164
+            },
+            "available_normal_rows": 20748,
+            "unavailable_rows": 1059,
+            "unavailable_anomaly_rows": 0
+          },
+          "feasible": true,
+          "status": "recall_feasible"
+        },
+        "median15_hgb": {
+          "threshold": 0.1659395019374588,
+          "policy": {
+            "persistence": 3,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5729,
+            "fp": 8243,
+            "fn": 1253,
+            "tn": 13564,
+            "precision": 0.41003435442313196,
+            "recall": 0.8205385276425093,
+            "f1": 0.5468168368807865,
+            "fpr_available_normal": 0.4024509325261205,
+            "fpr_all_normal": 0.3779978905855918,
+            "false_alarm_onsets": 95,
+            "false_onsets_per_available_normal_hour": 16.697588126159555,
+            "events": 19,
+            "detected_events": 18,
+            "event_recall": 0.9473684210526315,
+            "minimum_group_recall": 0.22551928783382788,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 0.9780487804878049,
+              "other/14": 0.9205298013245033,
+              "other/9": 0.9900249376558603,
+              "valve1/1": 0.9850746268656716,
+              "valve1/2": 0.22551928783382788,
+              "valve1/4": 0.9541547277936963,
+              "valve1/5": 0.8759305210918115,
+              "valve1/6": 0.9012345679012346,
+              "valve1/7": 0.9308641975308642,
+              "valve2/0": 0.8350253807106599,
+              "other/1": 0.776595744680851,
+              "other/10": 0.5486981677917069,
+              "other/7": 0.9711815561959655,
+              "valve1/10": 0.8379052369077307,
+              "valve1/11": 0.7644110275689223,
+              "valve1/8": 0.97,
+              "valve1/9": 0.8532338308457711
+            },
+            "available_normal_rows": 20482,
+            "unavailable_rows": 1353,
+            "unavailable_anomaly_rows": 28
+          },
+          "feasible": true,
+          "status": "recall_feasible"
+        }
+      },
+      "fit_audit": {
+        "fit_rows": 27730,
+        "positive_training_targets": 6982,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative",
+        "fit_groups": [
+          "anomaly-free/anomaly-free",
+          "other/1",
+          "other/10",
+          "other/14",
+          "other/7",
+          "other/9",
+          "valve1/1",
+          "valve1/10",
+          "valve1/11",
+          "valve1/2",
+          "valve1/4",
+          "valve1/5",
+          "valve1/6",
+          "valve1/7",
+          "valve1/8",
+          "valve1/9",
+          "valve2/0"
+        ],
+        "fit_sources": [
+          "anomaly-free/anomaly-free",
+          "other/14",
+          "other/5",
+          "other/9",
+          "valve1/1",
+          "valve1/2",
+          "valve1/4",
+          "valve1/5",
+          "valve1/6",
+          "valve1/7",
+          "valve2/0",
+          "other/1",
+          "other/10",
+          "other/11",
+          "other/7",
+          "valve1/10",
+          "valve1/11",
+          "valve1/8",
+          "valve1/9"
+        ],
+        "normal_scaling_rows": 21807,
+        "center": [
+          0.210398,
+          0.264633,
+          1.961,
+          0.054711,
+          88.1112,
+          27.9,
+          229.468,
+          124.0
+        ],
+        "scale": [
+          0.0318432828,
+          0.018473195999999956,
+          1.0890438299999996,
+          0.24308895478131948,
+          3.3407425799999935,
+          2.4627468600000015,
+          9.209911200000025,
+          4.916301600000003
+        ]
+      },
+      "procedures": {
+        "current_hgb": {
+          "pooled": {
+            "tp": 1306,
+            "fp": 190,
+            "fn": 234,
+            "tn": 2775,
+            "events": 5,
+            "detected_events": 5,
+            "false_alarm_onsets": 42,
+            "available_normal_rows": 2725,
+            "unavailable_rows": 240,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.8729946524064172,
+            "recall": 0.8480519480519481,
+            "f1": 0.8603425559947299,
+            "fpr_available_normal": 0.06972477064220184,
+            "fpr_all_normal": 0.06408094435075885,
+            "false_onsets_per_available_normal_hour": 55.48623853211009,
+            "event_recall": 1.0,
+            "macro_group_precision": 0.8672397668054572,
+            "macro_group_recall": 0.8482963313347085,
+            "minimum_group_recall": 0.6309226932668329,
+            "median_detected_event_delay_seconds": 7.0,
+            "alerted_readings": 1496
+          },
+          "per_group": {
+            "other/6": {
+              "tp": 397,
+              "fp": 0,
+              "fn": 5,
+              "tn": 745,
+              "precision": 1.0,
+              "recall": 0.9875621890547264,
+              "f1": 0.9937421777221527,
+              "fpr_available_normal": 0.0,
+              "fpr_all_normal": 0.0,
+              "false_alarm_onsets": 0,
+              "false_onsets_per_available_normal_hour": 0.0,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9875621890547264,
+              "group_recalls": {
+                "other/6": 0.9875621890547264
+              },
+              "available_normal_rows": 685,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                3.0
+              ]
+            },
+            "valve1/0": {
+              "tp": 253,
+              "fp": 64,
+              "fn": 148,
+              "tn": 682,
+              "precision": 0.7981072555205048,
+              "recall": 0.6309226932668329,
+              "f1": 0.7047353760445683,
+              "fpr_available_normal": 0.09329446064139942,
+              "fpr_all_normal": 0.08579088471849866,
+              "false_alarm_onsets": 10,
+              "false_onsets_per_available_normal_hour": 52.478134110787174,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.6309226932668329,
+              "group_recalls": {
+                "valve1/0": 0.6309226932668329
+              },
+              "available_normal_rows": 686,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                143.0
+              ]
+            },
+            "valve1/3": {
+              "tp": 370,
+              "fp": 47,
+              "fn": 34,
+              "tn": 697,
+              "precision": 0.8872901678657075,
+              "recall": 0.9158415841584159,
+              "f1": 0.9013398294762485,
+              "fpr_available_normal": 0.06871345029239766,
+              "fpr_all_normal": 0.06317204301075269,
+              "false_alarm_onsets": 16,
+              "false_onsets_per_available_normal_hour": 84.21052631578948,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9158415841584159,
+              "group_recalls": {
+                "valve1/3": 0.9158415841584159
+              },
+              "available_normal_rows": 684,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                7.0
+              ]
+            },
+            "valve2/1": {
+              "tp": 286,
+              "fp": 79,
+              "fn": 47,
+              "tn": 651,
+              "precision": 0.7835616438356164,
+              "recall": 0.8588588588588588,
+              "f1": 0.8194842406876791,
+              "fpr_available_normal": 0.11791044776119403,
+              "fpr_all_normal": 0.10821917808219178,
+              "false_alarm_onsets": 16,
+              "false_onsets_per_available_normal_hour": 85.97014925373134,
+              "events": 2,
+              "detected_events": 2,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8588588588588588,
+              "group_recalls": {
+                "valve2/1": 0.8588588588588588
+              },
+              "available_normal_rows": 670,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                41.0,
+                2.0
+              ]
+            }
+          }
+        },
+        "median15_hgb": {
+          "pooled": {
+            "tp": 1314,
+            "fp": 124,
+            "fn": 226,
+            "tn": 2841,
+            "events": 5,
+            "detected_events": 5,
+            "false_alarm_onsets": 6,
+            "available_normal_rows": 2669,
+            "unavailable_rows": 310,
+            "unavailable_anomaly_rows": 14,
+            "precision": 0.913769123783032,
+            "recall": 0.8532467532467533,
+            "f1": 0.8824714573539288,
+            "fpr_available_normal": 0.04645934807043837,
+            "fpr_all_normal": 0.0418212478920742,
+            "false_onsets_per_available_normal_hour": 8.092918696140877,
+            "event_recall": 1.0,
+            "macro_group_precision": 0.907990594493213,
+            "macro_group_recall": 0.8510000483766471,
+            "minimum_group_recall": 0.7082294264339152,
+            "median_detected_event_delay_seconds": 17.0,
+            "alerted_readings": 1438
+          },
+          "per_group": {
+            "other/6": {
+              "tp": 392,
+              "fp": 5,
+              "fn": 10,
+              "tn": 740,
+              "precision": 0.9874055415617129,
+              "recall": 0.9751243781094527,
+              "f1": 0.981226533166458,
+              "fpr_available_normal": 0.007451564828614009,
+              "fpr_all_normal": 0.006711409395973154,
+              "false_alarm_onsets": 0,
+              "false_onsets_per_available_normal_hour": 0.0,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9751243781094527,
+              "group_recalls": {
+                "other/6": 0.9751243781094527
+              },
+              "available_normal_rows": 671,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                10.0
+              ]
+            },
+            "valve1/0": {
+              "tp": 284,
+              "fp": 42,
+              "fn": 117,
+              "tn": 704,
+              "precision": 0.8711656441717791,
+              "recall": 0.7082294264339152,
+              "f1": 0.781292984869326,
+              "fpr_available_normal": 0.0625,
+              "fpr_all_normal": 0.05630026809651475,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 10.714285714285714,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.7082294264339152,
+              "group_recalls": {
+                "valve1/0": 0.7082294264339152
+              },
+              "available_normal_rows": 672,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                151.0
+              ]
+            },
+            "valve1/3": {
+              "tp": 370,
+              "fp": 12,
+              "fn": 34,
+              "tn": 732,
+              "precision": 0.9685863874345549,
+              "recall": 0.9158415841584159,
+              "f1": 0.9414758269720102,
+              "fpr_available_normal": 0.01791044776119403,
+              "fpr_all_normal": 0.016129032258064516,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 10.746268656716417,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9158415841584159,
+              "group_recalls": {
+                "valve1/3": 0.9158415841584159
+              },
+              "available_normal_rows": 670,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                12.0
+              ]
+            },
+            "valve2/1": {
+              "tp": 268,
+              "fp": 65,
+              "fn": 65,
+              "tn": 665,
+              "precision": 0.8048048048048048,
+              "recall": 0.8048048048048048,
+              "f1": 0.8048048048048048,
+              "fpr_available_normal": 0.09908536585365854,
+              "fpr_all_normal": 0.08904109589041095,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 10.97560975609756,
+              "events": 2,
+              "detected_events": 2,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8048048048048048,
+              "group_recalls": {
+                "valve2/1": 0.8048048048048048
+              },
+              "available_normal_rows": 656,
+              "unavailable_rows": 88,
+              "unavailable_anomaly_rows": 14,
+              "detected_event_delays_seconds": [
+                47.0,
+                17.0
+              ]
+            }
+          }
+        }
+      },
+      "fit_seconds": 3.5391208000073675,
+      "paired_score_seconds": 0.12060589999600779,
+      "raw_score_seconds": 0.06403690000297502,
+      "median_seconds": 0.026933600020129234,
+      "elapsed_seconds": 23.87172529999225
+    },
+    {
+      "fit_groups": [
+        "anomaly-free/anomaly-free",
+        "other/1",
+        "other/10",
+        "other/14",
+        "other/6",
+        "other/7",
+        "valve1/0",
+        "valve1/1",
+        "valve1/10",
+        "valve1/2",
+        "valve1/3",
+        "valve1/4",
+        "valve1/6",
+        "valve1/7",
+        "valve1/8",
+        "valve1/9",
+        "valve2/1"
+      ],
+      "assessment_groups": [
+        "other/9",
+        "valve1/11",
+        "valve1/5",
+        "valve2/0"
+      ],
+      "selection": {
+        "current_hgb": {
+          "threshold": 0.3215596017136311,
+          "policy": {
+            "persistence": 3,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5189,
+            "fp": 2730,
+            "fn": 1736,
+            "tn": 19075,
+            "precision": 0.6552595024624321,
+            "recall": 0.7493140794223827,
+            "f1": 0.699137698733495,
+            "fpr_available_normal": 0.13159163212185482,
+            "fpr_all_normal": 0.12520064205457465,
+            "false_alarm_onsets": 121,
+            "false_onsets_per_available_normal_hour": 20.996818663838813,
+            "events": 20,
+            "detected_events": 19,
+            "event_recall": 0.95,
+            "minimum_group_recall": 0.20474777448071216,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 1.0,
+              "other/14": 0.9006622516556292,
+              "other/6": 0.9850746268656716,
+              "valve1/0": 0.6708229426433915,
+              "valve1/1": 0.8681592039800995,
+              "valve1/2": 0.20474777448071216,
+              "valve1/3": 0.7871287128712872,
+              "valve1/4": 0.9025787965616046,
+              "valve1/6": 0.8469135802469135,
+              "valve1/7": 0.8765432098765432,
+              "other/1": 0.8138297872340425,
+              "other/10": 0.26229508196721313,
+              "other/7": 0.9913544668587896,
+              "valve1/10": 0.8079800498753117,
+              "valve1/8": 0.9875,
+              "valve1/9": 0.845771144278607,
+              "valve2/1": 0.7957957957957958
+            },
+            "available_normal_rows": 20746,
+            "unavailable_rows": 1059,
+            "unavailable_anomaly_rows": 0
+          },
+          "feasible": true,
+          "status": "recall_feasible"
+        },
+        "median15_hgb": {
+          "threshold": 0.40801653742802807,
+          "policy": {
+            "persistence": 5,
+            "max_gap_seconds": 2
+          },
+          "metrics": {
+            "tp": 5231,
+            "fp": 2438,
+            "fn": 1694,
+            "tn": 19367,
+            "precision": 0.6820967531620811,
+            "recall": 0.7553790613718412,
+            "f1": 0.7168699465533781,
+            "fpr_available_normal": 0.11904296875,
+            "fpr_all_normal": 0.11180921806925018,
+            "false_alarm_onsets": 25,
+            "false_onsets_per_available_normal_hour": 4.39453125,
+            "events": 20,
+            "detected_events": 20,
+            "event_recall": 1.0,
+            "minimum_group_recall": 0.26112759643916916,
+            "group_recalls": {
+              "anomaly-free/anomaly-free": 0.973170731707317,
+              "other/14": 0.9006622516556292,
+              "other/6": 0.9701492537313433,
+              "valve1/0": 0.6683291770573566,
+              "valve1/1": 0.917910447761194,
+              "valve1/2": 0.26112759643916916,
+              "valve1/3": 0.8316831683168316,
+              "valve1/4": 0.8252148997134671,
+              "valve1/6": 0.8444444444444444,
+              "valve1/7": 0.8765432098765432,
+              "other/1": 0.7606382978723404,
+              "other/10": 0.32594021215043395,
+              "other/7": 0.9654178674351584,
+              "valve1/10": 0.8229426433915212,
+              "valve1/8": 0.965,
+              "valve1/9": 0.835820895522388,
+              "valve2/1": 0.7687687687687688
+            },
+            "available_normal_rows": 20480,
+            "unavailable_rows": 1367,
+            "unavailable_anomaly_rows": 42
+          },
+          "feasible": true,
+          "status": "recall_feasible"
+        }
+      },
+      "fit_audit": {
+        "fit_rows": 27671,
+        "positive_training_targets": 6925,
+        "group_weighting": "Equal total weight per training leakage group",
+        "representation": "relative",
+        "fit_groups": [
+          "anomaly-free/anomaly-free",
+          "other/1",
+          "other/10",
+          "other/14",
+          "other/6",
+          "other/7",
+          "valve1/0",
+          "valve1/1",
+          "valve1/10",
+          "valve1/2",
+          "valve1/3",
+          "valve1/4",
+          "valve1/6",
+          "valve1/7",
+          "valve1/8",
+          "valve1/9",
+          "valve2/1"
+        ],
+        "fit_sources": [
+          "anomaly-free/anomaly-free",
+          "other/14",
+          "other/5",
+          "other/6",
+          "valve1/0",
+          "valve1/1",
+          "valve1/2",
+          "valve1/3",
+          "valve1/4",
+          "valve1/6",
+          "valve1/7",
+          "other/1",
+          "other/10",
+          "other/11",
+          "other/7",
+          "valve1/10",
+          "valve1/8",
+          "valve1/9",
+          "valve2/1"
+        ],
+        "normal_scaling_rows": 21805,
+        "center": [
+          0.210076,
+          0.263993,
+          1.96422,
+          0.054711,
+          88.4635,
+          27.9005,
+          229.506,
+          124.0
+        ],
+        "scale": [
+          0.01985497919999998,
+          0.018459852600000066,
+          1.085322504,
+          0.24308895478131948,
+          3.2468939999999966,
+          2.462005559999998,
+          9.203980799999997,
+          4.4478
+        ]
+      },
+      "procedures": {
+        "current_hgb": {
+          "pooled": {
+            "tp": 1204,
+            "fp": 63,
+            "fn": 393,
+            "tn": 2904,
+            "events": 4,
+            "detected_events": 4,
+            "false_alarm_onsets": 20,
+            "available_normal_rows": 2727,
+            "unavailable_rows": 240,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.9502762430939227,
+            "recall": 0.7539135879774578,
+            "f1": 0.840782122905028,
+            "fpr_available_normal": 0.0231023102310231,
+            "fpr_all_normal": 0.021233569261880688,
+            "false_onsets_per_available_normal_hour": 26.402640264026406,
+            "event_recall": 1.0,
+            "macro_group_precision": 0.9495838381119038,
+            "macro_group_recall": 0.7525557639093735,
+            "minimum_group_recall": 0.4619289340101523,
+            "median_detected_event_delay_seconds": 51.5,
+            "alerted_readings": 1267
+          },
+          "per_group": {
+            "other/9": {
+              "tp": 396,
+              "fp": 41,
+              "fn": 5,
+              "tn": 702,
+              "precision": 0.9061784897025171,
+              "recall": 0.9875311720698254,
+              "f1": 0.9451073985680191,
+              "fpr_available_normal": 0.060029282576866766,
+              "fpr_all_normal": 0.05518169582772544,
+              "false_alarm_onsets": 13,
+              "false_onsets_per_available_normal_hour": 68.5212298682284,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.9875311720698254,
+              "group_recalls": {
+                "other/9": 0.9875311720698254
+              },
+              "available_normal_rows": 683,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                4.0
+              ]
+            },
+            "valve1/5": {
+              "tp": 328,
+              "fp": 0,
+              "fn": 75,
+              "tn": 751,
+              "precision": 1.0,
+              "recall": 0.8138957816377171,
+              "f1": 0.8974008207934336,
+              "fpr_available_normal": 0.0,
+              "fpr_all_normal": 0.0,
+              "false_alarm_onsets": 0,
+              "false_onsets_per_available_normal_hour": 0.0,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8138957816377171,
+              "group_recalls": {
+                "valve1/5": 0.8138957816377171
+              },
+              "available_normal_rows": 691,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                47.0
+              ]
+            },
+            "valve2/0": {
+              "tp": 182,
+              "fp": 22,
+              "fn": 212,
+              "tn": 709,
+              "precision": 0.8921568627450981,
+              "recall": 0.4619289340101523,
+              "f1": 0.6086956521739131,
+              "fpr_available_normal": 0.03278688524590164,
+              "fpr_all_normal": 0.030095759233926128,
+              "false_alarm_onsets": 7,
+              "false_onsets_per_available_normal_hour": 37.5558867362146,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.4619289340101523,
+              "group_recalls": {
+                "valve2/0": 0.4619289340101523
+              },
+              "available_normal_rows": 671,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                57.0
+              ]
+            },
+            "valve1/11": {
+              "tp": 298,
+              "fp": 0,
+              "fn": 101,
+              "tn": 742,
+              "precision": 1.0,
+              "recall": 0.7468671679197995,
+              "f1": 0.8550932568149211,
+              "fpr_available_normal": 0.0,
+              "fpr_all_normal": 0.0,
+              "false_alarm_onsets": 0,
+              "false_onsets_per_available_normal_hour": 0.0,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.7468671679197995,
+              "group_recalls": {
+                "valve1/11": 0.7468671679197995
+              },
+              "available_normal_rows": 682,
+              "unavailable_rows": 60,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                56.0
+              ]
+            }
+          }
+        },
+        "median15_hgb": {
+          "pooled": {
+            "tp": 1184,
+            "fp": 78,
+            "fn": 413,
+            "tn": 2889,
+            "events": 4,
+            "detected_events": 4,
+            "false_alarm_onsets": 7,
+            "available_normal_rows": 2671,
+            "unavailable_rows": 296,
+            "unavailable_anomaly_rows": 0,
+            "precision": 0.9381933438985737,
+            "recall": 0.741390106449593,
+            "f1": 0.8282616299405386,
+            "fpr_available_normal": 0.02920254586297267,
+            "fpr_all_normal": 0.0262891809908999,
+            "false_onsets_per_available_normal_hour": 9.43466866342194,
+            "event_recall": 1.0,
+            "macro_group_precision": 0.9303446261682243,
+            "macro_group_recall": 0.7399429431693455,
+            "minimum_group_recall": 0.4289340101522843,
+            "median_detected_event_delay_seconds": 60.0,
+            "alerted_readings": 1262
+          },
+          "per_group": {
+            "other/9": {
+              "tp": 389,
+              "fp": 39,
+              "fn": 12,
+              "tn": 704,
+              "precision": 0.9088785046728972,
+              "recall": 0.970074812967581,
+              "f1": 0.9384800965018094,
+              "fpr_available_normal": 0.05829596412556054,
+              "fpr_all_normal": 0.052489905787348586,
+              "false_alarm_onsets": 5,
+              "false_onsets_per_available_normal_hour": 26.90582959641256,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.970074812967581,
+              "group_recalls": {
+                "other/9": 0.970074812967581
+              },
+              "available_normal_rows": 669,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                13.0
+              ]
+            },
+            "valve1/5": {
+              "tp": 328,
+              "fp": 0,
+              "fn": 75,
+              "tn": 751,
+              "precision": 1.0,
+              "recall": 0.8138957816377171,
+              "f1": 0.8974008207934336,
+              "fpr_available_normal": 0.0,
+              "fpr_all_normal": 0.0,
+              "false_alarm_onsets": 0,
+              "false_onsets_per_available_normal_hour": 0.0,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.8138957816377171,
+              "group_recalls": {
+                "valve1/5": 0.8138957816377171
+              },
+              "available_normal_rows": 677,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                55.0
+              ]
+            },
+            "valve2/0": {
+              "tp": 169,
+              "fp": 39,
+              "fn": 225,
+              "tn": 692,
+              "precision": 0.8125,
+              "recall": 0.4289340101522843,
+              "f1": 0.5614617940199336,
+              "fpr_available_normal": 0.0593607305936073,
+              "fpr_all_normal": 0.0533515731874145,
+              "false_alarm_onsets": 2,
+              "false_onsets_per_available_normal_hour": 10.95890410958904,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.4289340101522843,
+              "group_recalls": {
+                "valve2/0": 0.4289340101522843
+              },
+              "available_normal_rows": 657,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                240.0
+              ]
+            },
+            "valve1/11": {
+              "tp": 298,
+              "fp": 0,
+              "fn": 101,
+              "tn": 742,
+              "precision": 1.0,
+              "recall": 0.7468671679197995,
+              "f1": 0.8550932568149211,
+              "fpr_available_normal": 0.0,
+              "fpr_all_normal": 0.0,
+              "false_alarm_onsets": 0,
+              "false_onsets_per_available_normal_hour": 0.0,
+              "events": 1,
+              "detected_events": 1,
+              "event_recall": 1.0,
+              "minimum_group_recall": 0.7468671679197995,
+              "group_recalls": {
+                "valve1/11": 0.7468671679197995
+              },
+              "available_normal_rows": 668,
+              "unavailable_rows": 74,
+              "unavailable_anomaly_rows": 0,
+              "detected_event_delays_seconds": [
+                65.0
+              ]
+            }
+          }
+        }
+      },
+      "fit_seconds": 3.2874006000056397,
+      "paired_score_seconds": 0.11841540000750683,
+      "raw_score_seconds": 0.060024399994290434,
+      "median_seconds": 0.025738000011187978,
+      "elapsed_seconds": 19.34430679999059
+    }
+  ],
+  "procedures": {
+    "current_hgb": {
+      "pooled": {
+        "tp": 7751,
+        "fp": 16079,
+        "fn": 771,
+        "tn": 8693,
+        "events": 24,
+        "detected_events": 14,
+        "false_alarm_onsets": 137,
+        "available_normal_rows": 23473,
+        "unavailable_rows": 1299,
+        "unavailable_anomaly_rows": 0,
+        "precision": 0.3252622744439782,
+        "recall": 0.9095282797465384,
+        "f1": 0.4791666666666667,
+        "fpr_available_normal": 0.6849997869893069,
+        "fpr_all_normal": 0.6490796060067818,
+        "false_onsets_per_available_normal_hour": 21.011374771013507,
+        "event_recall": 0.5833333333333334,
+        "macro_group_precision": 0.6225560500953652,
+        "macro_group_recall": 0.9047191958432812,
+        "minimum_group_recall": 0.4619289340101523,
+        "median_detected_event_delay_seconds": 6.5,
+        "alerted_readings": 23830
+      },
+      "per_group": {
+        "anomaly-free/anomaly-free": {
+          "tp": 410,
+          "fp": 9401,
+          "fn": 0,
+          "tn": 177,
+          "precision": 0.04178982774436857,
+          "recall": 1.0,
+          "f1": 0.0802269836610899,
+          "fpr_available_normal": 0.9877075015759613,
+          "fpr_all_normal": 0.9815201503445395,
+          "false_alarm_onsets": 18,
+          "false_onsets_per_available_normal_hour": 6.808152973313722,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "anomaly-free/anomaly-free": 1.0
+          },
+          "available_normal_rows": 9518,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/1": {
+          "tp": 402,
+          "fp": 681,
+          "fn": 0,
+          "tn": 62,
+          "precision": 0.37119113573407203,
+          "recall": 1.0,
+          "f1": 0.5414141414141415,
+          "fpr_available_normal": 0.9970717423133236,
+          "fpr_all_normal": 0.9165545087483177,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.27086383601757,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/1": 1.0
+          },
+          "available_normal_rows": 683,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/6": {
+          "tp": 405,
+          "fp": 687,
+          "fn": 0,
+          "tn": 62,
+          "precision": 0.3708791208791209,
+          "recall": 1.0,
+          "f1": 0.5410821643286573,
+          "fpr_available_normal": 0.9970972423802612,
+          "fpr_all_normal": 0.9172229639519359,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.2249637155297535,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/6": 1.0
+          },
+          "available_normal_rows": 689,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/1": {
+          "tp": 188,
+          "fp": 495,
+          "fn": 0,
+          "tn": 62,
+          "precision": 0.2752562225475842,
+          "recall": 1.0,
+          "f1": 0.4316877152698048,
+          "fpr_available_normal": 0.9959758551307847,
+          "fpr_all_normal": 0.8886894075403949,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 7.2434607645875255,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "other/1": 1.0
+          },
+          "available_normal_rows": 497,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/8": {
+          "tp": 400,
+          "fp": 682,
+          "fn": 0,
+          "tn": 62,
+          "precision": 0.36968576709796674,
+          "recall": 1.0,
+          "f1": 0.5398110661268556,
+          "fpr_available_normal": 0.9970760233918129,
+          "fpr_all_normal": 0.9166666666666666,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.2631578947368425,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/8": 1.0
+          },
+          "available_normal_rows": 684,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/14": {
+          "tp": 288,
+          "fp": 53,
+          "fn": 14,
+          "tn": 550,
+          "precision": 0.844574780058651,
+          "recall": 0.9536423841059603,
+          "f1": 0.895800933125972,
+          "fpr_available_normal": 0.09760589318600368,
+          "fpr_all_normal": 0.087893864013267,
+          "false_alarm_onsets": 7,
+          "false_onsets_per_available_normal_hour": 46.40883977900552,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9536423841059603,
+          "group_recalls": {
+            "other/14": 0.9536423841059603
+          },
+          "available_normal_rows": 543,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            6.0
+          ]
+        },
+        "valve1/2": {
+          "tp": 269,
+          "fp": 180,
+          "fn": 68,
+          "tn": 558,
+          "precision": 0.5991091314031181,
+          "recall": 0.798219584569733,
+          "f1": 0.6844783715012722,
+          "fpr_available_normal": 0.26548672566371684,
+          "fpr_all_normal": 0.24390243902439024,
+          "false_alarm_onsets": 20,
+          "false_onsets_per_available_normal_hour": 106.19469026548673,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.798219584569733,
+          "group_recalls": {
+            "valve1/2": 0.798219584569733
+          },
+          "available_normal_rows": 678,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            3.0
+          ]
+        },
+        "other/7": {
+          "tp": 344,
+          "fp": 117,
+          "fn": 3,
+          "tn": 626,
+          "precision": 0.7462039045553145,
+          "recall": 0.9913544668587896,
+          "f1": 0.8514851485148515,
+          "fpr_available_normal": 0.17130307467057102,
+          "fpr_all_normal": 0.15746971736204576,
+          "false_alarm_onsets": 3,
+          "false_onsets_per_available_normal_hour": 15.81259150805271,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9913544668587896,
+          "group_recalls": {
+            "other/7": 0.9913544668587896
+          },
+          "available_normal_rows": 683,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            3.0
+          ]
+        },
+        "valve1/9": {
+          "tp": 345,
+          "fp": 182,
+          "fn": 57,
+          "tn": 564,
+          "precision": 0.6546489563567363,
+          "recall": 0.8582089552238806,
+          "f1": 0.7427341227125942,
+          "fpr_available_normal": 0.2653061224489796,
+          "fpr_all_normal": 0.24396782841823056,
+          "false_alarm_onsets": 17,
+          "false_onsets_per_available_normal_hour": 89.21282798833819,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8582089552238806,
+          "group_recalls": {
+            "valve1/9": 0.8582089552238806
+          },
+          "available_normal_rows": 686,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            35.0
+          ]
+        },
+        "valve1/4": {
+          "tp": 347,
+          "fp": 684,
+          "fn": 2,
+          "tn": 62,
+          "precision": 0.33656644034917554,
+          "recall": 0.994269340974212,
+          "f1": 0.5028985507246376,
+          "fpr_available_normal": 0.9970845481049563,
+          "fpr_all_normal": 0.9168900804289544,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.247813411078717,
+          "events": 2,
+          "detected_events": 1,
+          "event_recall": 0.5,
+          "minimum_group_recall": 0.994269340974212,
+          "group_recalls": {
+            "valve1/4": 0.994269340974212
+          },
+          "available_normal_rows": 686,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            2.0
+          ]
+        },
+        "valve1/7": {
+          "tp": 405,
+          "fp": 625,
+          "fn": 0,
+          "tn": 64,
+          "precision": 0.3932038834951456,
+          "recall": 1.0,
+          "f1": 0.5644599303135889,
+          "fpr_available_normal": 0.9936406995230525,
+          "fpr_all_normal": 0.9071117561683599,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 11.446740858505564,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/7": 1.0
+          },
+          "available_normal_rows": 629,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/10": {
+          "tp": 1037,
+          "fp": 1356,
+          "fn": 0,
+          "tn": 103,
+          "precision": 0.4333472628499791,
+          "recall": 1.0,
+          "f1": 0.60466472303207,
+          "fpr_available_normal": 0.9970588235294118,
+          "fpr_all_normal": 0.9294037011651817,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 5.294117647058823,
+          "events": 2,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "other/10": 1.0
+          },
+          "available_normal_rows": 1360,
+          "unavailable_rows": 99,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/10": {
+          "tp": 401,
+          "fp": 683,
+          "fn": 0,
+          "tn": 62,
+          "precision": 0.3699261992619926,
+          "recall": 1.0,
+          "f1": 0.54006734006734,
+          "fpr_available_normal": 0.997080291970803,
+          "fpr_all_normal": 0.9167785234899329,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.255474452554745,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/10": 1.0
+          },
+          "available_normal_rows": 685,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/6": {
+          "tp": 397,
+          "fp": 0,
+          "fn": 5,
+          "tn": 745,
+          "precision": 1.0,
+          "recall": 0.9875621890547264,
+          "f1": 0.9937421777221527,
+          "fpr_available_normal": 0.0,
+          "fpr_all_normal": 0.0,
+          "false_alarm_onsets": 0,
+          "false_onsets_per_available_normal_hour": 0.0,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9875621890547264,
+          "group_recalls": {
+            "other/6": 0.9875621890547264
+          },
+          "available_normal_rows": 685,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            3.0
+          ]
+        },
+        "valve1/0": {
+          "tp": 253,
+          "fp": 64,
+          "fn": 148,
+          "tn": 682,
+          "precision": 0.7981072555205048,
+          "recall": 0.6309226932668329,
+          "f1": 0.7047353760445683,
+          "fpr_available_normal": 0.09329446064139942,
+          "fpr_all_normal": 0.08579088471849866,
+          "false_alarm_onsets": 10,
+          "false_onsets_per_available_normal_hour": 52.478134110787174,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.6309226932668329,
+          "group_recalls": {
+            "valve1/0": 0.6309226932668329
+          },
+          "available_normal_rows": 686,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            143.0
+          ]
+        },
+        "valve1/3": {
+          "tp": 370,
+          "fp": 47,
+          "fn": 34,
+          "tn": 697,
+          "precision": 0.8872901678657075,
+          "recall": 0.9158415841584159,
+          "f1": 0.9013398294762485,
+          "fpr_available_normal": 0.06871345029239766,
+          "fpr_all_normal": 0.06317204301075269,
+          "false_alarm_onsets": 16,
+          "false_onsets_per_available_normal_hour": 84.21052631578948,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9158415841584159,
+          "group_recalls": {
+            "valve1/3": 0.9158415841584159
+          },
+          "available_normal_rows": 684,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            7.0
+          ]
+        },
+        "valve2/1": {
+          "tp": 286,
+          "fp": 79,
+          "fn": 47,
+          "tn": 651,
+          "precision": 0.7835616438356164,
+          "recall": 0.8588588588588588,
+          "f1": 0.8194842406876791,
+          "fpr_available_normal": 0.11791044776119403,
+          "fpr_all_normal": 0.10821917808219178,
+          "false_alarm_onsets": 16,
+          "false_onsets_per_available_normal_hour": 85.97014925373134,
+          "events": 2,
+          "detected_events": 2,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8588588588588588,
+          "group_recalls": {
+            "valve2/1": 0.8588588588588588
+          },
+          "available_normal_rows": 670,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            41.0,
+            2.0
+          ]
+        },
+        "other/9": {
+          "tp": 396,
+          "fp": 41,
+          "fn": 5,
+          "tn": 702,
+          "precision": 0.9061784897025171,
+          "recall": 0.9875311720698254,
+          "f1": 0.9451073985680191,
+          "fpr_available_normal": 0.060029282576866766,
+          "fpr_all_normal": 0.05518169582772544,
+          "false_alarm_onsets": 13,
+          "false_onsets_per_available_normal_hour": 68.5212298682284,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9875311720698254,
+          "group_recalls": {
+            "other/9": 0.9875311720698254
+          },
+          "available_normal_rows": 683,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            4.0
+          ]
+        },
+        "valve1/5": {
+          "tp": 328,
+          "fp": 0,
+          "fn": 75,
+          "tn": 751,
+          "precision": 1.0,
+          "recall": 0.8138957816377171,
+          "f1": 0.8974008207934336,
+          "fpr_available_normal": 0.0,
+          "fpr_all_normal": 0.0,
+          "false_alarm_onsets": 0,
+          "false_onsets_per_available_normal_hour": 0.0,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8138957816377171,
+          "group_recalls": {
+            "valve1/5": 0.8138957816377171
+          },
+          "available_normal_rows": 691,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            47.0
+          ]
+        },
+        "valve2/0": {
+          "tp": 182,
+          "fp": 22,
+          "fn": 212,
+          "tn": 709,
+          "precision": 0.8921568627450981,
+          "recall": 0.4619289340101523,
+          "f1": 0.6086956521739131,
+          "fpr_available_normal": 0.03278688524590164,
+          "fpr_all_normal": 0.030095759233926128,
+          "false_alarm_onsets": 7,
+          "false_onsets_per_available_normal_hour": 37.5558867362146,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.4619289340101523,
+          "group_recalls": {
+            "valve2/0": 0.4619289340101523
+          },
+          "available_normal_rows": 671,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            57.0
+          ]
+        },
+        "valve1/11": {
+          "tp": 298,
+          "fp": 0,
+          "fn": 101,
+          "tn": 742,
+          "precision": 1.0,
+          "recall": 0.7468671679197995,
+          "f1": 0.8550932568149211,
+          "fpr_available_normal": 0.0,
+          "fpr_all_normal": 0.0,
+          "false_alarm_onsets": 0,
+          "false_onsets_per_available_normal_hour": 0.0,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.7468671679197995,
+          "group_recalls": {
+            "valve1/11": 0.7468671679197995
+          },
+          "available_normal_rows": 682,
+          "unavailable_rows": 60,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            56.0
+          ]
+        }
+      }
+    },
+    "median15_hgb": {
+      "pooled": {
+        "tp": 7726,
+        "fp": 15836,
+        "fn": 796,
+        "tn": 8936,
+        "events": 24,
+        "detected_events": 14,
+        "false_alarm_onsets": 41,
+        "available_normal_rows": 23151,
+        "unavailable_rows": 1663,
+        "unavailable_anomaly_rows": 42,
+        "precision": 0.32790085731262203,
+        "recall": 0.9065946960807322,
+        "f1": 0.4816107717242239,
+        "fpr_available_normal": 0.6840309273897456,
+        "fpr_all_normal": 0.6392701437106411,
+        "false_onsets_per_available_normal_hour": 6.375534534145394,
+        "event_recall": 0.5833333333333334,
+        "macro_group_precision": 0.6311511000941218,
+        "macro_group_recall": 0.9010133391661617,
+        "minimum_group_recall": 0.4289340101522843,
+        "median_detected_event_delay_seconds": 20.5,
+        "alerted_readings": 23562
+      },
+      "per_group": {
+        "anomaly-free/anomaly-free": {
+          "tp": 410,
+          "fp": 9410,
+          "fn": 0,
+          "tn": 168,
+          "precision": 0.04175152749490835,
+          "recall": 1.0,
+          "f1": 0.0801564027370479,
+          "fpr_available_normal": 0.9901094276094277,
+          "fpr_all_normal": 0.9824598037168512,
+          "false_alarm_onsets": 6,
+          "false_onsets_per_available_normal_hour": 2.2727272727272725,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "anomaly-free/anomaly-free": 1.0
+          },
+          "available_normal_rows": 9504,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/1": {
+          "tp": 402,
+          "fp": 665,
+          "fn": 0,
+          "tn": 78,
+          "precision": 0.3767572633552015,
+          "recall": 1.0,
+          "f1": 0.5473110959836623,
+          "fpr_available_normal": 0.9940209267563528,
+          "fpr_all_normal": 0.8950201884253028,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.381165919282512,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/1": 1.0
+          },
+          "available_normal_rows": 669,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/6": {
+          "tp": 405,
+          "fp": 671,
+          "fn": 0,
+          "tn": 78,
+          "precision": 0.3763940520446097,
+          "recall": 1.0,
+          "f1": 0.5469277515192438,
+          "fpr_available_normal": 0.9940740740740741,
+          "fpr_all_normal": 0.8958611481975968,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.333333333333333,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/6": 1.0
+          },
+          "available_normal_rows": 675,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/1": {
+          "tp": 188,
+          "fp": 479,
+          "fn": 0,
+          "tn": 78,
+          "precision": 0.2818590704647676,
+          "recall": 1.0,
+          "f1": 0.439766081871345,
+          "fpr_available_normal": 0.9917184265010351,
+          "fpr_all_normal": 0.8599640933572711,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 7.453416149068324,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "other/1": 1.0
+          },
+          "available_normal_rows": 483,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/8": {
+          "tp": 400,
+          "fp": 666,
+          "fn": 0,
+          "tn": 78,
+          "precision": 0.37523452157598497,
+          "recall": 1.0,
+          "f1": 0.5457025920873124,
+          "fpr_available_normal": 0.9940298507462687,
+          "fpr_all_normal": 0.8951612903225806,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.3731343283582085,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/8": 1.0
+          },
+          "available_normal_rows": 670,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/14": {
+          "tp": 281,
+          "fp": 61,
+          "fn": 21,
+          "tn": 542,
+          "precision": 0.8216374269005848,
+          "recall": 0.9304635761589404,
+          "f1": 0.8726708074534162,
+          "fpr_available_normal": 0.11531190926275993,
+          "fpr_all_normal": 0.1011608623548922,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 6.805293005671078,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9304635761589404,
+          "group_recalls": {
+            "other/14": 0.9304635761589404
+          },
+          "available_normal_rows": 529,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            22.0
+          ]
+        },
+        "valve1/2": {
+          "tp": 288,
+          "fp": 152,
+          "fn": 49,
+          "tn": 586,
+          "precision": 0.6545454545454545,
+          "recall": 0.8545994065281899,
+          "f1": 0.7413127413127413,
+          "fpr_available_normal": 0.2289156626506024,
+          "fpr_all_normal": 0.20596205962059622,
+          "false_alarm_onsets": 6,
+          "false_onsets_per_available_normal_hour": 32.53012048192771,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8545994065281899,
+          "group_recalls": {
+            "valve1/2": 0.8545994065281899
+          },
+          "available_normal_rows": 664,
+          "unavailable_rows": 88,
+          "unavailable_anomaly_rows": 14,
+          "detected_event_delays_seconds": [
+            19.0
+          ]
+        },
+        "other/7": {
+          "tp": 336,
+          "fp": 126,
+          "fn": 11,
+          "tn": 617,
+          "precision": 0.7272727272727273,
+          "recall": 0.968299711815562,
+          "f1": 0.830655129789864,
+          "fpr_available_normal": 0.18834080717488788,
+          "fpr_all_normal": 0.1695827725437416,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.381165919282512,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.968299711815562,
+          "group_recalls": {
+            "other/7": 0.968299711815562
+          },
+          "available_normal_rows": 669,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            11.0
+          ]
+        },
+        "valve1/9": {
+          "tp": 344,
+          "fp": 152,
+          "fn": 58,
+          "tn": 594,
+          "precision": 0.6935483870967742,
+          "recall": 0.8557213930348259,
+          "f1": 0.7661469933184856,
+          "fpr_available_normal": 0.2261904761904762,
+          "fpr_all_normal": 0.2037533512064343,
+          "false_alarm_onsets": 4,
+          "false_onsets_per_available_normal_hour": 21.428571428571427,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8557213930348259,
+          "group_recalls": {
+            "valve1/9": 0.8557213930348259
+          },
+          "available_normal_rows": 672,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            43.0
+          ]
+        },
+        "valve1/4": {
+          "tp": 331,
+          "fp": 668,
+          "fn": 18,
+          "tn": 78,
+          "precision": 0.33133133133133136,
+          "recall": 0.9484240687679083,
+          "f1": 0.4910979228486647,
+          "fpr_available_normal": 0.9940476190476191,
+          "fpr_all_normal": 0.8954423592493298,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.357142857142857,
+          "events": 2,
+          "detected_events": 1,
+          "event_recall": 0.5,
+          "minimum_group_recall": 0.9484240687679083,
+          "group_recalls": {
+            "valve1/4": 0.9484240687679083
+          },
+          "available_normal_rows": 672,
+          "unavailable_rows": 88,
+          "unavailable_anomaly_rows": 14,
+          "detected_event_delays_seconds": [
+            19.0
+          ]
+        },
+        "valve1/7": {
+          "tp": 405,
+          "fp": 593,
+          "fn": 0,
+          "tn": 96,
+          "precision": 0.405811623246493,
+          "recall": 1.0,
+          "f1": 0.5773342836778332,
+          "fpr_available_normal": 0.9866888519134775,
+          "fpr_all_normal": 0.8606676342525399,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 11.980033277870216,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/7": 1.0
+          },
+          "available_normal_rows": 601,
+          "unavailable_rows": 88,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/10": {
+          "tp": 1037,
+          "fp": 1324,
+          "fn": 0,
+          "tn": 135,
+          "precision": 0.4392206692079627,
+          "recall": 1.0,
+          "f1": 0.6103590347263096,
+          "fpr_available_normal": 0.993993993993994,
+          "fpr_all_normal": 0.9074708704592186,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 5.405405405405405,
+          "events": 2,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "other/10": 1.0
+          },
+          "available_normal_rows": 1332,
+          "unavailable_rows": 127,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "valve1/10": {
+          "tp": 401,
+          "fp": 667,
+          "fn": 0,
+          "tn": 78,
+          "precision": 0.37546816479400746,
+          "recall": 1.0,
+          "f1": 0.5459496255956433,
+          "fpr_available_normal": 0.9940387481371088,
+          "fpr_all_normal": 0.8953020134228188,
+          "false_alarm_onsets": 1,
+          "false_onsets_per_available_normal_hour": 5.365126676602086,
+          "events": 1,
+          "detected_events": 0,
+          "event_recall": 0.0,
+          "minimum_group_recall": 1.0,
+          "group_recalls": {
+            "valve1/10": 1.0
+          },
+          "available_normal_rows": 671,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": []
+        },
+        "other/6": {
+          "tp": 392,
+          "fp": 5,
+          "fn": 10,
+          "tn": 740,
+          "precision": 0.9874055415617129,
+          "recall": 0.9751243781094527,
+          "f1": 0.981226533166458,
+          "fpr_available_normal": 0.007451564828614009,
+          "fpr_all_normal": 0.006711409395973154,
+          "false_alarm_onsets": 0,
+          "false_onsets_per_available_normal_hour": 0.0,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9751243781094527,
+          "group_recalls": {
+            "other/6": 0.9751243781094527
+          },
+          "available_normal_rows": 671,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            10.0
+          ]
+        },
+        "valve1/0": {
+          "tp": 284,
+          "fp": 42,
+          "fn": 117,
+          "tn": 704,
+          "precision": 0.8711656441717791,
+          "recall": 0.7082294264339152,
+          "f1": 0.781292984869326,
+          "fpr_available_normal": 0.0625,
+          "fpr_all_normal": 0.05630026809651475,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 10.714285714285714,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.7082294264339152,
+          "group_recalls": {
+            "valve1/0": 0.7082294264339152
+          },
+          "available_normal_rows": 672,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            151.0
+          ]
+        },
+        "valve1/3": {
+          "tp": 370,
+          "fp": 12,
+          "fn": 34,
+          "tn": 732,
+          "precision": 0.9685863874345549,
+          "recall": 0.9158415841584159,
+          "f1": 0.9414758269720102,
+          "fpr_available_normal": 0.01791044776119403,
+          "fpr_all_normal": 0.016129032258064516,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 10.746268656716417,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.9158415841584159,
+          "group_recalls": {
+            "valve1/3": 0.9158415841584159
+          },
+          "available_normal_rows": 670,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            12.0
+          ]
+        },
+        "valve2/1": {
+          "tp": 268,
+          "fp": 65,
+          "fn": 65,
+          "tn": 665,
+          "precision": 0.8048048048048048,
+          "recall": 0.8048048048048048,
+          "f1": 0.8048048048048048,
+          "fpr_available_normal": 0.09908536585365854,
+          "fpr_all_normal": 0.08904109589041095,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 10.97560975609756,
+          "events": 2,
+          "detected_events": 2,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8048048048048048,
+          "group_recalls": {
+            "valve2/1": 0.8048048048048048
+          },
+          "available_normal_rows": 656,
+          "unavailable_rows": 88,
+          "unavailable_anomaly_rows": 14,
+          "detected_event_delays_seconds": [
+            47.0,
+            17.0
+          ]
+        },
+        "other/9": {
+          "tp": 389,
+          "fp": 39,
+          "fn": 12,
+          "tn": 704,
+          "precision": 0.9088785046728972,
+          "recall": 0.970074812967581,
+          "f1": 0.9384800965018094,
+          "fpr_available_normal": 0.05829596412556054,
+          "fpr_all_normal": 0.052489905787348586,
+          "false_alarm_onsets": 5,
+          "false_onsets_per_available_normal_hour": 26.90582959641256,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.970074812967581,
+          "group_recalls": {
+            "other/9": 0.970074812967581
+          },
+          "available_normal_rows": 669,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            13.0
+          ]
+        },
+        "valve1/5": {
+          "tp": 328,
+          "fp": 0,
+          "fn": 75,
+          "tn": 751,
+          "precision": 1.0,
+          "recall": 0.8138957816377171,
+          "f1": 0.8974008207934336,
+          "fpr_available_normal": 0.0,
+          "fpr_all_normal": 0.0,
+          "false_alarm_onsets": 0,
+          "false_onsets_per_available_normal_hour": 0.0,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.8138957816377171,
+          "group_recalls": {
+            "valve1/5": 0.8138957816377171
+          },
+          "available_normal_rows": 677,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            55.0
+          ]
+        },
+        "valve2/0": {
+          "tp": 169,
+          "fp": 39,
+          "fn": 225,
+          "tn": 692,
+          "precision": 0.8125,
+          "recall": 0.4289340101522843,
+          "f1": 0.5614617940199336,
+          "fpr_available_normal": 0.0593607305936073,
+          "fpr_all_normal": 0.0533515731874145,
+          "false_alarm_onsets": 2,
+          "false_onsets_per_available_normal_hour": 10.95890410958904,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.4289340101522843,
+          "group_recalls": {
+            "valve2/0": 0.4289340101522843
+          },
+          "available_normal_rows": 657,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            240.0
+          ]
+        },
+        "valve1/11": {
+          "tp": 298,
+          "fp": 0,
+          "fn": 101,
+          "tn": 742,
+          "precision": 1.0,
+          "recall": 0.7468671679197995,
+          "f1": 0.8550932568149211,
+          "fpr_available_normal": 0.0,
+          "fpr_all_normal": 0.0,
+          "false_alarm_onsets": 0,
+          "false_onsets_per_available_normal_hour": 0.0,
+          "events": 1,
+          "detected_events": 1,
+          "event_recall": 1.0,
+          "minimum_group_recall": 0.7468671679197995,
+          "group_recalls": {
+            "valve1/11": 0.7468671679197995
+          },
+          "available_normal_rows": 668,
+          "unavailable_rows": 74,
+          "unavailable_anomaly_rows": 0,
+          "detected_event_delays_seconds": [
+            65.0
+          ]
+        }
+      }
+    }
+  },
+  "elapsed_seconds": 106.20812060000026,
+  "activated": false
+}

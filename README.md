@@ -46,6 +46,11 @@ Python, scikit-learn, Streamlit, Plotly, LangGraph and Pydantic support the work
 pipeline. Data loading, modeling, retrieval, orchestration and reports have separate
 modules. [Implementation and boundaries](docs/architecture.md).
 
+An optional [OPC UA capture prototype](docs/opcua-demo.md) replays a development
+recording through a local simulated server. Its read-only client checks complete
+eight-channel frames, quality and timing before saving an audited capture for
+offline detector comparison. It has not been connected to a PLC or plant network.
+
 ## What the models show
 
 The active detector uses supervised gradient boosting with changes relative to
@@ -62,6 +67,12 @@ Earlier model selection reached 95.1% precision and 65.8% recall on one validati
 allocation. The audit shows how sensitive performance is to the recording groups.
 Both analyses use already-inspected development data. New recordings are needed
 for a stronger generalization claim.
+
+A subsequent [causal score-filter comparison](docs/refinement-results.md) reduced
+false alert onsets from 137 to 41 under the same grouped development protocol.
+False-positive readings changed only from 16,079 to 15,836, and median detected
+event delay increased from 6.5 to 20.5 seconds. The filter remains experimental;
+it does not resolve the detector's high false-positive rate.
 
 [Grouped audit and reproduction](docs/generalization-results.md) · [Development comparison](docs/improvement-results.md) · [Historical baseline](docs/evaluation.md)
 
