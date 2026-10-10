@@ -3,9 +3,10 @@
 A fixed 15-reading median of the gradient-boosting scores reduced separate false
 alert onsets from 137 to 41 in the grouped development comparison. Precision
 changed from 32.53% to 32.79%, while recall fell from 90.95% to 90.66%.
-This is an alert-policy improvement in episode fragmentation, with a substantial
-remaining false-positive burden. It is not a new neural model or LLM fine-tuning.
-The experimental policy has not replaced the active detector.
+The filter produces fewer alert episodes, but many normal readings still
+trigger alerts. This experiment changes the alert policy without fitting a
+new neural model or fine-tuning an LLM. The policy remains experimental and has
+not replaced the active detector.
 
 ## Why this experiment
 
@@ -18,12 +19,11 @@ found large score-level differences between recordings. Those neural results do
 not establish superiority over the grouped baseline and were not reused as a
 matched comparator here.
 
-The bounded hypothesis was that a causal median could suppress short score
-fluctuations and reduce fragmented alerts. The window was fixed at 15 ready
+The experiment tested whether a median of current and past scores could
+suppress short fluctuations and reduce fragmented alerts. The window was fixed at 15 ready
 readings before evaluation. There was no search over smoothing windows and no
-revision after seeing outer-fold outcomes. Smoothing cannot correct a model that
-assigns persistently high scores to normal operation. That limitation is visible
-in the results below.
+revision after seeing outer-fold outcomes. Smoothing cannot correct persistently high scores during normal operation,
+which remain a problem in these results.
 
 ## Matched development protocol
 
@@ -81,7 +81,7 @@ are also 322 fewer available normal readings. Fewer false-positive readings alon
 therefore cannot be interpreted as better discrimination. The policy produces
 fewer separate alert episodes while retaining long false alerts.
 
-The extra initialization loses assessment of 42 anomalous readings. Total missed
+The longer initialization leaves 42 additional anomalous readings unscored. Total missed
 anomalous readings increase by 25 after inner threshold selection, while the
 median detected-event delay increases by 14 seconds. Delay medians describe only
 detected events and need not represent the same event set. The existing event
@@ -94,8 +94,7 @@ its false-positive readings increase from 9,401 to 9,410, despite fewer separate
 onsets. The group name is an inventory identifier, not a statement that every
 merged reading is normal. `valve2/0` also becomes worse, with precision falling
 from 89.22% to 81.25%, recall from 46.19% to 42.89%, and false-positive readings
-rising from 22 to 39. The paired table includes all groups rather than selecting
-only favorable cases.
+rising from 22 to 39. The paired table reports every group.
 
 | Group | Precision, before → after | Recall, before → after | False readings, before → after | False onsets, before → after |
 |---|---:|---:|---:|---:|
@@ -152,10 +151,9 @@ inner group separation and complete out-of-fold coverage. A synthetic nested
 rerun flips only the first outer fold's labels and verifies that its selected
 policies, training reference and saved scores remain identical, while its
 assessment changes. The test also rejects any attempted partition access beyond
-training and validation. This substantiates implementation boundaries, but cannot
-remove the retrospective nature or limited diversity of the dataset.
+training and validation. These tests check which data the implementation can use. The comparison still
+depends on a small, previously inspected dataset.
 
-Smoothing remains an inactive experiment. The evidence supports fewer fragmented
-alerts, not reliable physical-failure detection. Better operating-condition
-coverage and independently collected evaluation recordings are still needed
-before making that stronger claim.
+The filter remains inactive. Assessing reliable physical-failure detection
+requires broader operating-condition coverage and independently collected
+evaluation recordings, beyond the reduction in fragmented alerts measured here.

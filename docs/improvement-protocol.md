@@ -6,8 +6,8 @@ develop a lower-alert operating point. The already inspected test partition is
 not used for selection or rescored. Any new generalization claim requires a new
 evaluation plan and fresh holdout.
 
-The user chose precision priority before any new candidate was fitted: fewer
-alerts even if more anomalies are missed. Require pooled point recall of at least
+Precision was chosen as the priority before fitting new candidates, accepting
+more missed anomalies in exchange for fewer alerts. Require pooled point recall of at least
 0.60, event recall of at least 0.60, and point recall of at least 0.20 in every
 validation group with anomalies to prevent a nearly silent detector from winning.
 Among feasible choices, maximize precision, then minimize false alert onsets per

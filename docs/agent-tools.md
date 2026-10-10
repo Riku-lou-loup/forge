@@ -1,10 +1,10 @@
 # Typed investigation tools
 
-This increment gives FORGE two typed local tools and a bounded dispatcher for a
-model adapter. The runnable demo on this page uses a scripted caller. It does not
-call a language model, interpret a natural-language request or generate an
-explanation.
-The existing Streamlit and LangGraph investigation paths are unchanged.
+FORGE exposes two local tools through typed request and response schemas. A
+dispatcher validates requests and limits how many tools a caller can execute.
+The demo on this page uses a Python script to choose the calls, so it runs without
+a language model, natural-language interpretation or a generated explanation.
+The Streamlit application has its own LangGraph policy workflow.
 
 ## Tools and results
 
@@ -23,7 +23,7 @@ are not model feature attribution or a physical diagnosis.
 `search_evidence` accepts a nonblank query of at most 2,000 characters and a limit
 of one to three passages. It returns verified passage text, suggested checks,
 citations, corpus provenance and an explicit abstention flag. BM25 is the default
-for this new tool bundle. TF-IDF remains selectable, and the existing app retains
+for this tool bundle. TF-IDF remains selectable, and the existing app retains
 its own TF-IDF default. Retrieval does not require a loaded detector.
 
 The application chooses the repository, retrieval backend and optional PyTorch
@@ -56,8 +56,7 @@ are resolved from that root.
 The printed JSON contains `mode: scripted_offline_tool_demo` and
 `llm_called: false`. The fixed demo policy requests inspection, then searches
 using the returned sensor names only if an alert exists. This routing is Python
-code. The standalone search tool can also be called independently by a future
-adapter.
+code. A model adapter can also call the search tool independently.
 
 ## Dispatch limits and verification
 
@@ -79,7 +78,7 @@ result. Search checks every returned passage against the retriever's corpus
 before exposing it. Documents remain text; the dispatcher offers no shell,
 network search, equipment control or arbitrary file-access capability.
 
-The 25 new tests cover measured scoring, annotation exclusion, unavailable
+The 25 tool tests cover measured scoring, annotation exclusion, unavailable
 readings, pinned test-partition rejection, retrieval abstention and citation
 tampering, input schemas, call budgets, duplicate IDs, result size, error
 sanitization and the scripted demo. At that milestone, the complete suite passed 182 tests.
@@ -97,7 +96,7 @@ quality. Model pointers, training data and existing notebooks were not changed.
 
 ## Local model integration
 
-The separate [local LLM demo](local-llm.md) now connects these tools to Ollama.
+The separate [local LLM demo](local-llm.md) connects these tools to Ollama.
 It adapts the schemas to native tool calling, bounds model requests, and checks
 the generated report's structured facts and exact citation/check pairs. Its
 free-form explanation remains unreviewed model text. This does not establish

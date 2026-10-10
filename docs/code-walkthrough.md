@@ -1,8 +1,9 @@
 # Following one investigation through the code
 
-The application starts with a recording and a frozen local detector. A report is
-the output of several small modules; the notebook is preserved as the exploratory
-record, while reusable behavior lives in the package.
+An investigation starts with a recording and a frozen local detector. This
+walkthrough follows the original baseline from data loading to report export,
+then explains the supervised detector used by the application. The notebooks
+record the exploration, and the package contains the reusable implementation.
 
 ## From source files to scores
 
@@ -75,6 +76,6 @@ a model with history.
 
 Finally, `ml/activation.py` checks a local candidate and updates the application's
 active pointer. The original Isolation Forest and benchmark are retained. The
-new classifier is gradient boosting, not PyTorch; neural complexity was not
-needed for this measured improvement. Read `docs/improvement-results.md` for
+selected classifier uses gradient boosting. This comparison did not require a
+neural model to achieve its measured improvement. Read `docs/improvement-results.md` for
 remaining misses, false alerts and why a fresh evaluation collection is needed.

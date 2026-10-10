@@ -7,8 +7,8 @@ ranges overlap, so these descriptive findings alone are not a detector.
 
 [Baseline modeling preparation](02_baseline_modeling.ipynb) constructs the normal
 training feature table from 14 assigned recordings, keeps provenance separate,
-and examines the pressure channel's zero MAD. The user's original modeling
-cells are preserved. Reusable training now lives in `src/forge/ml/`, with its
+and examines the pressure channel's zero MAD. The notebook records the initial
+modeling calculations. Reusable training lives in `src/forge/ml/`, with its
 results in [the benchmark report](../docs/evaluation.md).
 
 [Validation score separation](03_validation_diagnostics.ipynb) compares the frozen

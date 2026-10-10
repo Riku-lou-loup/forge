@@ -5,7 +5,7 @@ between groups, and some groups have overlapping or reversed normal/anomaly
 score ordering. Changing one shared threshold cannot resolve both problems.
 
 This analysis uses the frozen `isolation_forest_1024` artifact from run
-`20261007T003523Z-e78e7b17`, threshold **0.504721**, and the original three-reading
+`20261007T003523Z-e78e7b17`, threshold 0.504721, and the original three-reading
 persistence rule. It reads only the nine validation recordings, deduplicated
 into eight groups and 9,973 observations. No unknown anomaly annotations occur
 in this partition. No model fitting, threshold selection, or test scoring is
@@ -32,13 +32,14 @@ uncertainty intervals for temporally dependent data.
 
 ## What the distributions show
 
-**`other/1` has a ranking failure as well as a threshold problem.** Every normal
+`other/1` has a ranking failure as well as a threshold problem. Every normal
 score exceeds the threshold; persistence leaves an FPR of 99.6%. Normal scores
 have a higher median than anomaly scores, and AUC is only 0.175. Raising a
 one-sided threshold would still favor the wrong ordering through much of this
 group. Lower alert volume alone would not establish better discrimination.
 
-**`other/10` and `valve2/1` show better ordering but a poor shared operating point.**
+`other/10` and `valve2/1` have better score ordering, but the shared threshold
+produces many false alerts.
 Their normal score medians sit above the threshold, and roughly 79.2% of normal
 scores exceed it before persistence. Anomalous medians are higher, but the
 distributions overlap. A higher threshold could reduce false positives at a
@@ -46,7 +47,7 @@ recall cost. This analysis does not select that tradeoff or install per-group
 thresholds. A recording-specific threshold fitted to its labels would not be a
 demonstration of generalization to a new recording.
 
-**`other/7` separates well.** AUC is 0.996, with 0.5% persistent FPR and 99.1%
+`other/7` separates normal and anomalous readings well. AUC is 0.996, with 0.5% persistent FPR and 99.1%
 recall. Its raw normal exceedance rate is 13.5%, so persistence suppresses many
 isolated exceedances here. In `other/1`, almost all normal scores remain high,
 so waiting for three observations offers little help.

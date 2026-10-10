@@ -6,7 +6,7 @@ requests still require `--enable-llm` in the investigation command.
 
 ## Storage lifecycle
 
-Ollama's runtime and model files now live in `/tmp/forge-cache-<uid>` on the
+Ollama's runtime and model files live in `/tmp/forge-cache-<uid>` on the
 allocated compute node. The directory belongs to the user and is private. A
 kernel lock allows one FORGE server session per account and node to use this
 cache at a time. Cache reuse does not extend a Slurm allocation or retain GPU
@@ -75,14 +75,14 @@ After `Relay ready`, run the investigation in a third terminal:
 .\.venv\Scripts\python.exe -m forge.agents.local_demo --enable-llm --backend-llm ensicompute --recording valve1/1 --export
 ```
 
-Authentication remains in OpenSSH. The script stores no password. This workflow
-still uses separate allocation and relay terminals; it is not a single-command
-launcher for the entire application.
+OpenSSH handles authentication, and the script stores no password. Keep the
+allocation and relay terminals open while running investigations in the third
+terminal.
 
 ## Shutdown and limits
 
 Stop the relay terminal first, then press Ctrl+C in the allocation terminal.
-The updated supervisor requests a cooperative stop inside its job and gives
+The supervisor requests a cooperative stop inside its job and gives
 the compute worker time to close the server and remove its own session folder.
 Runtime and model files stay in the cache. If cooperative shutdown fails, the
 supervisor falls back to signalling the compute step and requesting job

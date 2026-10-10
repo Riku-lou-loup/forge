@@ -1,11 +1,11 @@
 # Alert selection with HGB, CatBoost and TabM
 
-The precision-weighted HGB procedure reached 63.85% precision and
-63.06% recall in this grouped development run. Ordered CatBoost reached
-71.52% and 64.48%, and the compact TabM ensemble reached
-83.37% and 56.14%. These are matched results on reused
-development recordings. None of the experimental procedures has replaced the
-active detector.
+With alert selection weighted toward precision, histogram gradient boosting
+(HGB) reached 63.85% precision and 63.06% recall in this grouped development run.
+Ordered CatBoost reached 71.52% precision and 64.48% recall. The compact TabM
+ensemble reached 83.37% precision and 56.14% recall. All procedures used the same
+previously inspected development recordings. They remain experimental, and the
+active detector is unchanged.
 
 ![Matched precision, recall and false-positive readings](assets/modern-comparison.png)
 
@@ -15,15 +15,16 @@ The [causal median experiment](refinement-results.md) reduced fragmented alerts,
 but normal readings still received persistent high scores. Reviewing threshold
 selection exposed a separate problem. The existing rule required 60% point recall,
 60% event recall and 20% recall in every positive group before considering precision.
-When no threshold met those requirements, its fallback prioritized fulfillment of
-the recall floors. In two outer folds, this selected thresholds below 0.008.
+When no threshold met those requirements, the fallback selected the setting
+that came closest to satisfying the recall floors. In two outer folds, this selected thresholds below 0.008.
 
-The new operating policy maximizes F0.5, which weights precision more strongly
-than recall, without those hard recall floors. It is a selection objective, not
-a guarantee of 95% precision. A policy that never alerts receives zero precision
-and zero F0.5. The historical control retains the old rule, while a second
-procedure changes only threshold selection on exactly the same fitted HGB models.
-This separates the decision-policy effect from the classifier comparison.
+The new alert-selection rule maximizes F0.5, which weights precision more
+strongly than recall, without requiring those recall floors. The 95% precision
+target remains a target, not a guaranteed result of this objective. A policy
+that never alerts receives zero precision and zero F0.5. To measure the effect
+of the selection rule, the historical control and a second procedure use exactly
+the same fitted HGB models. Only their alert selection differs. CatBoost and
+TabM then test whether changing the classifier improves on that second procedure.
 
 ## Models and frozen protocol
 
@@ -33,8 +34,9 @@ run. It fixes five outer folds, three inner folds and seed 42 across the same
 original training and validation partitions are opened through the hash-checked
 loader. Previously inspected test CSVs are not opened by this experiment.
 
-All classifiers receive the same 32 causal relative features, the same eligible
-training readings and the existing equal total weight per training overlap group.
+All classifiers receive the same 32 causal relative features and eligible
+training readings. These features describe sensor changes using current and
+earlier measurements. Each training overlap group receives equal total weight.
 Features are computed separately within each source before overlap deduplication.
 Unknown and conflicting labels are excluded from training. Normal observations
 from the fitting groups supply the robust sensor scales. The first 60 unlabeled
@@ -88,12 +90,11 @@ the outer results.
 | Unavailable anomalous readings | 0 | 0 | 0 | 0 |
 | Positive groups with zero recall | 0 | 1 | 1 | 2 |
 
-The HGB policy change removes 13,036 false-positive readings
-(81.1%) relative to the historical control, while changing
-recall from 90.95% to 63.06%. The control reproduces the
-earlier audit's predictions and per-group results exactly. HGB's score ranking is
-identical under the two policies. Its precision gain therefore comes from alert
-selection rather than a newly learned representation.
+Changing HGB's alert-selection rule removes 13,036 false-positive readings
+(81.1%) relative to the historical control, while recall falls from 90.95% to
+63.06%. The control reproduces the earlier audit's predictions and per-group
+results exactly. Both policies use identical HGB scores, so alert selection
+accounts for the precision gain.
 
 CatBoost improves both precision and recall over HGB with the same F0.5
 selection objective, while reducing false alert onsets from 287 to 69. Compact
@@ -129,9 +130,9 @@ Per-group AP is also saved, with null for single-class or empty groups.
 
 TabM's AP is below HGB's in four of the five folds, despite its higher pooled
 precision and F0.5 at the selected operating points. CatBoost's AP is higher in
-two folds and lower in three. These results support specific operating-point
-tradeoffs, not a claim that a newer architecture consistently ranks anomalies
-better. TabM's eight-epoch budget also does not establish convergence.
+two folds and lower in three. The models therefore offer different tradeoffs at the selected thresholds,
+without a consistent improvement in anomaly ranking from the newer architecture.
+TabM's eight-epoch budget also does not establish convergence.
 
 Selected thresholds and persistence lengths are shown as threshold / readings.
 Their numeric values are specific to the fitted model and are not calibrated
@@ -178,9 +179,8 @@ retained because pooled precision can conceal missed recording groups.
 All three F0.5 procedures miss every annotated anomaly in `valve1/2`. TabM also
 misses every anomaly in `valve2/0`, and its 100% precision on `valve1/0` accompanies
 only 0.2% recall. The `anomaly-free/anomaly-free` overlap group still accounts for
-829 of TabM's 954 false-positive readings. That inventory group includes `other/5`
-and is not entirely normal. These failures remain visible even when pooled
-precision improves.
+829 of TabM's 954 false-positive readings. That inventory group includes `other/5` and is not entirely normal. Pooled
+precision alone would hide these differences in recording coverage.
 
 All these recordings come from a limited laboratory setting and have influenced
 earlier project choices. Nested refitting prevents the direct use of an outer
@@ -206,9 +206,8 @@ To regenerate the figure from a completed run, pass its `results.json` to
 
 The version snapshots describe Windows x86-64 with Python 3.13. Other supported
 environments can install the `modern` project extra with their appropriate Torch
-build. This run used CatBoost 1.2.10,
-TabM 0.0.3, Torch 2.14.1+cpu
-and scikit-learn 1.9.1.
+build. This run used CatBoost 1.2.10, TabM 0.0.3, Torch 2.14.1+cpu and
+scikit-learn 1.9.1.
 
 Run `20261010T190903Z-ddac3806` took 968.2 seconds with model fitting
 limited to one CPU thread. That includes inner selection, outer refits, prediction,
@@ -221,9 +220,8 @@ Only trusted local model artifacts should be loaded. The public
 per-group and per-fold evidence, with source and configuration hashes.
 
 All 120 targeted and regression tests passed, including 42 new checks for this
-comparison and the TabM adapter. Independent deserialization of the outer-fold-one
-CatBoost and TabM models reproduced all 14,176 assessment scores and readiness
-flags exactly. The historical HGB control reproduced every saved score and
+comparison and the TabM adapter. Reloading the saved CatBoost and TabM models for the first outer fold reproduced
+all 14,176 assessment scores and readiness flags exactly. The historical HGB control reproduced every saved score and
 per-group result from the earlier audit. All 26 protected file hashes matched.
 
 The synthetic tests cover group boundaries, future-value invariance, training-only
@@ -244,6 +242,6 @@ results justify testing them here, but do not establish superiority on SKAB.
 - [CatBoost paper, NeurIPS 2018](https://proceedings.neurips.cc/paper/2018/hash/14491b756b3a51daac41c24863285549-Abstract.html) and [official training parameters](https://catboost.ai/docs/en/references/training-parameters/common).
 - [F-beta definition](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html).
 
-Further work needs additional operating regimes and independently collected
-recordings. Repeatedly changing models until the same development groups look
-good would not supply that evidence.
+Further model comparisons need additional operating regimes and independently
+collected recordings to assess whether these tradeoffs hold beyond the current
+development groups.

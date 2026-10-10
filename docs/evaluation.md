@@ -1,9 +1,9 @@
 # First anomaly-detection benchmark
 
-The frozen Isolation Forest reached **0.616 point F1** on the held-out recordings
-and detected **18 of 23 annotated events**. It also produced **145.4 false alert
-onsets per normal hour**. This is a working research baseline, not a detector
-ready for unattended maintenance alerts.
+The frozen Isolation Forest reached 0.616 point F1 on the held-out recordings
+and detected 18 of 23 annotated events. It also produced 145.4 false alert onsets
+per normal hour. That alert frequency is too high for unattended maintenance use,
+so this result provides a research baseline.
 
 ## Selection and results
 
@@ -21,8 +21,8 @@ and either 256 or 1,024 samples per tree. Validation F1 selected the latter.
 The learned detector's small F1 advantage came with a large alert burden.
 The statistical baseline had stronger ranking quality on validation. Selecting
 only for point F1 was therefore a poor proxy for operational usefulness. The
-chosen operating point remains frozen so this limitation is visible rather than
-being hidden by tuning on the test set.
+chosen operating point remains frozen, preserving the measured result without
+further tuning on the test set.
 
 | Held-out metric | Result |
 |---|---:|
@@ -71,11 +71,10 @@ the training rows. A low-flow regime can be far from the pooled median while
 still being normal for that regime. Reference deviations must not be interpreted
 as a causal diagnosis or an Isolation Forest feature explanation.
 
-Next modeling work should define an alert-burden objective before selection,
-compare operating-regime-aware references and causal temporal features on
-development data, and obtain a fresh holdout for any new performance claim.
-PyTorch sequence models should be compared against these baselines rather than
-assumed to improve them.
+The benchmark motivated an alert-burden objective and development comparisons
+of operating-regime-aware references and causal temporal features. A new
+performance claim still requires a fresh holdout. PyTorch sequence models also
+need a comparison against these baselines before claiming an improvement.
 
 ## Reproduction and audit
 

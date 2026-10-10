@@ -130,6 +130,6 @@ and factory deployment would require separate evidence. Published leaderboard
 numbers from other protocols are not directly comparable.
 
 Normal-training selection and deduplication are implemented in the notebook.
-The next milestone is to fit a robust statistical baseline and compare it with
-Isolation Forest on validation data. Final test performance will be measured after
-model development and evaluation rules are frozen.
+The statistical baseline and Isolation Forest have since been compared on
+validation data, followed by test evaluation with the selected model and rules
+frozen. The benchmark linked above records those results.

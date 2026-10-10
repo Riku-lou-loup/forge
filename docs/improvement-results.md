@@ -75,7 +75,7 @@ each such reading contributes one second of capped exposure. Sampling gaps do
 not count as observed normal operation.
 
 The 95% precision target is met. The 1% available-normal FPR and two false onsets
-per available normal hour targets are **not met**. Detecting all ten events means
+per available normal hour targets remain unmet. Detecting all ten events means
 that at least one new alert onset falls inside each annotated event. It does not
 mean every anomalous reading was detected. The other/10 overlap group has only
 21.7% point recall. Median alert delay is also higher, although the two delay
@@ -97,7 +97,7 @@ disabled to avoid random row validation. Recordings that share observations are
 kept in the same leakage group, and each training group receives equal total
 weight after duplicate observations are removed.
 
-The selected threshold is **0.19899640796797832**. An alert requires five
+The selected threshold is 0.19899640796797832. An alert requires five
 consecutive readings above that threshold, compared with three for the original
 baseline. Scores are not calibrated physical failure probabilities. The first
 60 readings establish an unlabeled operating reference and receive no assessment.
@@ -122,7 +122,7 @@ During verification, the first implementation was found to initialize overlappin
 recordings as one merged stream. The app initializes each source file separately.
 That mismatch produced an overly optimistic provisional result of 98.7%
 precision. Both comparison stages were rerun after correcting the boundary.
-The published **95.1%** result uses separate source-file initialization before
+The published 95.1% result uses separate source-file initialization before
 deduplication. For a shared observation, the first inventory occurrence supplies
 the prediction context. Conflicting annotations remain unknown. A regression
 test checks this behavior.

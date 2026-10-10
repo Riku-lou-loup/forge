@@ -1,22 +1,19 @@
 # Generalization and tuning audit
 
-This audit refits FORGE’s detectors while excluding different whole recording
+This audit refits FORGE's detectors while excluding different whole recording
 groups. It tests whether the current gradient-boosting configuration remains
 effective beyond its original training allocation and whether a fixed, small
 hyperparameter search improves its precision.
 
-The tuned procedure reaches **33.7% precision** and
-**89.5% recall** on pooled outer-fold predictions.
-The current configuration reaches 32.5% precision
-and 91.0% recall under the same fold protocol.
-Tuning changes precision by **+1.2 percentage points** and
-recall by **-1.5 percentage points**. These are development
-audit results, not a new-machine reliability claim.
+The tuned procedure reaches 33.7% precision and 89.5% recall on pooled
+outer-fold predictions. Under the same protocol, the current configuration
+reaches 32.5% precision and 91.0% recall. The differences are +1.2 percentage
+points in precision and -1.5 percentage points in recall. This development
+audit does not establish reliability on a new machine.
 
 In 2 of the five outer folds, no gradient-boosting candidate met
 all inner recall requirements, so the declared fallback supplied the alert
-settings. The per-fold results and unmet alert targets below are part of the
-outcome, not exceptions removed from the comparison.
+settings. The report includes those folds and records which alert targets remain unmet.
 
 ## What the comparison measures
 
@@ -27,11 +24,11 @@ outer-training pool, three inner folds select the threshold and persistence.
 The tuned procedure also chooses among four declared gradient-boosting
 configurations. Whole overlap groups stay together at both levels.
 
-“Current configuration” means a new fit using the existing hyperparameters,
-with its alert settings selected inside each outer fold. It is not the app’s
+"Current configuration" means a new fit using the existing hyperparameters,
+with its alert settings selected inside each outer fold. It is not the app's
 saved model scored on observations it already fitted. Isolation Forest is
 also refitted in each fold and receives the same inner alert-selection rule.
-Global robust scales are recomputed from each fit’s normal observations.
+Global robust scales are recomputed from each fit's normal observations.
 The relative models still initialize their unlabeled reference from the first
 60 readings of each assessed source file, matching the application.
 
@@ -48,12 +45,10 @@ is the relevant measure of the declared tuning procedure.
 | Current gradient-boosting configuration | 32.5% | 91.0% | 16,079 | 771 | 137 | 21.01 | 14 / 24 |
 | Tuned gradient-boosting procedure | 33.7% | 89.5% | 14,975 | 898 | 220 | 33.74 | 16 / 24 |
 
-Relative to the current configuration, tuning changes false-positive readings
-by -1,104, missed anomalous readings by
-+127, and separate false alert episodes by
-+83.
-A small precision gain should be assessed alongside these changes rather
-than taken as a sufficient reason to replace the active model.
+Tuning produces 1,104 fewer false-positive readings, but misses 127 more
+anomalous readings and produces 83 more separate false alert episodes.
+The small precision gain therefore comes with more missed anomalies and
+more interruptions, which limits the case for replacing the active model.
 
 | Target for the tuned procedure | Achieved? |
 |---|---|
@@ -117,24 +112,22 @@ concern about fit and operating-condition sensitivity, but they do not
 separate memorization from distribution differences by themselves. Means
 and ranges above describe five folds, not confidence intervals.
 
-The largest false-positive count belongs to `anomaly-free/anomaly-free` with
-9,102 readings, or 60.8% of
-the tuned procedure's false-positive readings. This group contains
-`anomaly-free/anomaly-free`, `other/5`. This concentration helps locate
-the weakness, but it does not establish which sensor or mechanism caused it.
+The `anomaly-free/anomaly-free` overlap group accounts for 9,102 readings,
+or 60.8% of the tuned procedure's false positives. It contains the source files
+`anomaly-free/anomaly-free` and `other/5`. Most false-positive readings therefore come from one group, but this does
+not identify the sensor or mechanism responsible.
 
 ## Final tuning artifact
 
 After the nested assessment, five-fold grouped selection across the full
 development pool selected `larger_hgb`. It was refitted on
-31,995 available observations, including
-8,522 anomalous training targets.
+31,995 available observations, including 8,522 anomalous training targets.
 The selected threshold is `0.14579881621623614` with
 3 consecutive above-threshold readings.
 Its full-pool inner selection status is `recall_feasible`.
 
 This is a research artifact. Its full-pool selection scores are not
-independent performance, and it has **not been activated**. The app’s prior
+independent performance, and it has not been activated. The app's prior
 model, original baseline and historical result files retain their recorded
 hashes. The JSON records the final candidate settings and model checksum.
 

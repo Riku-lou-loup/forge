@@ -5,9 +5,10 @@ analytical notes with BM25, and draft an explanation. The model chooses the tool
 calls and search query. Python validates and executes those requests, then checks
 the report's structured measurements and cited checks before accepting a draft.
 
-This is a separate command-line demo. The Streamlit application and its existing
-LangGraph policy workflow keep their current behavior. The local LLM does not
-replace the anomaly detector or change the active model.
+The demo runs from the command line. The Streamlit application uses a separate
+LangGraph workflow with fixed Python decisions and copied analytical checks.
+The local LLM uses the selected anomaly detector without replacing it or changing
+the active model.
 
 ## Run an investigation
 
@@ -113,10 +114,10 @@ design. The current small playbook keeps this demo bounded.
 
 The command unloads Qwen in a `finally` block after success or failure. Requests
 also use a 30-second idle keep-alive as a fallback if the client exits unexpectedly.
-The command checks Windows memory before starting: it requires at least 6 GiB
-of available physical RAM and 8 GiB of remaining system commit capacity. These
-are conservative demo guardrails, not a guarantee against memory exhaustion.
-Other processes can allocate memory after the check. The Windows check is skipped
+Before starting on Windows, the command requires at least 6 GiB of available
+physical RAM and 8 GiB of remaining system commit capacity. These minimums reduce
+the risk of memory exhaustion but cannot prevent it, because other processes
+can allocate memory after the check. The Windows check is skipped
 on other operating systems. Direct users of the Python client must manage their
 own memory preflight and model lifecycle.
 
@@ -167,8 +168,7 @@ alert-specific guidance in a no-alert draft. The prompt was revised, and the
 application now ends tool selection after a no-alert or insufficient-data
 inspection and rejects alert-specific checks for those results. One intermediate
 run also failed when the Ollama inference worker closed its connection. It
-returned a blocked result with no accepted draft. No automatic retry hides such
-failures.
+returned a blocked result with no accepted draft. The application reports these failures without retrying automatically.
 
 These two smoke runs helped shape the implementation and are not an independent
 evaluation set. Their timings are individual warm-run observations, not a

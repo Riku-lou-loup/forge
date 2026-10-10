@@ -1,8 +1,8 @@
-# PyTorch and BM25 increment
+# PyTorch and BM25 demo
 
-This demo adds two working components to FORGE: a small temporal neural network
-trained with PyTorch, and BM25 retrieval over the existing analytical notes.
-They can run together through the investigation graph. The active model remains
+This demo runs a small PyTorch temporal neural network with BM25 retrieval
+through the investigation graph. The network scores sensor readings, and BM25
+retrieves passages from the existing analytical notes. The active model remains
 the gradient-boosting detector, and default investigations still use TF-IDF.
 
 Open [notebook 06](../notebooks/06_pytorch_bm25_demo.ipynb) for the training loss,
@@ -43,7 +43,7 @@ from the repository root. Omitting `--torch-artifact` uses the existing active
 model. Omitting `--retriever` uses TF-IDF. Neither option changes a model pointer.
 Raw recordings, checkpoints and exported reports remain outside Git.
 
-## What the increment shows
+## Results
 
 The fixed eight-epoch PyTorch run reached 92.7% precision at 31.4% recall on the
 existing validation allocation: 1,100 true positives, 86 false positives, 2,407
@@ -54,9 +54,9 @@ remain in the recall denominator.
 
 The threshold was selected on this same validation data to prioritize precision
 subject to a 30% recall floor. The low recall and two groups with no detected
-anomalous readings limit the result. This is evidence that the training and
-inference pipeline works. It does not establish an improvement over the grouped
-audit or performance on new equipment. The architecture and training budget
+anomalous readings limit the result. The run verifies the training and inference pipeline, but its different
+evaluation procedure prevents a direct comparison with the grouped audit.
+Performance on new equipment remains unmeasured. The architecture and training budget
 were fixed before this run, and the original test recordings were not opened.
 
 BM25 and TF-IDF both reached recall at 3 and reciprocal rank of 1.0 for the seven

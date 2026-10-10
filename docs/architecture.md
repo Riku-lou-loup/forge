@@ -1,8 +1,12 @@
 # Architecture
 
-FORGE connects a frozen anomaly detector to a local evidence investigation. The
-implemented path uses real SKAB recordings, scikit-learn, TF-IDF retrieval,
-LangGraph, and Streamlit. It can run without a provider account or API key.
+FORGE scores recorded sensor data and retrieves analytical notes for human review.
+The Streamlit application uses a frozen scikit-learn detector, TF-IDF retrieval
+and a LangGraph workflow whose decisions follow Python rules. It runs on real
+SKAB recordings without a provider account or API key. A separate
+[Qwen command-line workflow](local-llm.md) lets a language model choose tools and
+draft an explanation through Ollama, locally or on
+[EnsiCompute](ensicompute.md).
 
 ## Data and model boundary
 
@@ -55,13 +59,12 @@ flowchart TD
     B -. Budget checks between nodes .-> Q[Stop with partial observations only]
 ```
 
-The roles are **local policy agents**: Python makes the conditional decisions.
-They do not use a language model or autonomous free-form planning. This is a
-bounded agent workflow with extractive retrieval, not an LLM RAG demonstration.
-LangGraph carries typed state, branches, a single permitted query refinement,
-and a terminal review outcome. No benefit over a simpler implementation is
-claimed; the graph makes the decision path inspectable and provides a boundary
-for later model-assisted drafting.
+In this graph, each agent is a Python role with fixed decision rules. LangGraph
+carries typed state between roles, follows conditional branches, permits one
+query refinement and records the review outcome. Drafting copies checks from
+retrieved passages. This path uses neither a language model nor free-form
+planning. The graph makes the decision path inspectable, although it has not
+been shown to outperform a simpler implementation.
 
 The observation tool selects the highest-scoring persistent alert episode
 without seeing labels. It returns the episode bounds and the three largest
@@ -101,8 +104,10 @@ explicit abstention; invalid citations remove the draft's guidance.
 
 No network tools, shell, equipment control, or maintenance-system writes are
 available to the graph. Ambient LangSmith tracing is explicitly disabled.
-Setting the reserved provider environment variables does not enable LLM calls.
-Future provider integration needs an explicit opt-in and spending limit.
+Setting the reserved provider environment variables does not enable LLM calls
+in this graph. The separate Qwen command requires explicit enablement for each
+run. Hosted API support remains unimplemented and would need an explicit opt-in
+and spending limit.
 
 `reports/incident.py` defines the report schema. Every result starts unreviewed.
 The UI requires a reviewer name and an explicit acknowledgment before marking a
@@ -117,11 +122,11 @@ notes are ignored. Source manifests, the small original corpus, configuration,
 aggregate benchmark results, and code remain tracked. The app has no server-side
 account system and is intended for local use.
 
-The precision-focused development protocol is implemented. Next evidence includes
-a fresh evaluation collection, applicable equipment documentation, and a separately
-evaluated LLM drafting adapter. Computer
-vision remains optional: nameplate recognition could identify an asset, followed
-by human confirmation before selecting its documentation.
+The precision-focused development protocol is implemented. Further evaluation
+needs fresh recordings, applicable equipment documentation and an independent
+assessment of the LLM drafts. Computer vision remains optional. Nameplate
+recognition could identify an asset, with human confirmation before selecting
+its documentation.
 
 Implementation references: [LangGraph graph API](https://docs.langchain.com/oss/python/langgraph/graph-api),
 [scikit-learn TF-IDF](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html),

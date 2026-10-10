@@ -2,10 +2,11 @@
 
 The first frozen run detected 31.4% of annotated anomalous readings at 92.7%
 precision on reused development validation data. It missed 2,407 of 3,507
-anomalous readings, and two validation groups had zero recall. This increment
-provides a working CPU training, checkpoint and investigation path. It does not
-establish an improvement over the active model or the grouped generalization
-audit, which used a different evaluation procedure.
+anomalous readings, and two validation groups had zero recall. The run verifies
+that CPU training, checkpoint loading and investigation work together. The
+different evaluation procedure prevents a direct comparison with the grouped
+generalization audit, and these results do not establish an improvement over
+the active model.
 
 ## Run the demo
 
@@ -101,8 +102,8 @@ matrix includes unavailable readings as unalerted:
 | Anomaly | 1,100 | 2,407 |
 | Normal | 86 | 6,380 |
 
-Precision was **92.7%** and recall was **31.4%**. False positive rate was **1.39%**
-among 6,208 available normal readings, or **1.33%** among all 6,466 normal readings.
+Precision was 92.7% and recall was 31.4%. The false-positive rate was 1.39%
+among 6,208 available normal readings, or 1.33% among all 6,466 normal readings.
 There were seven false alert onsets. Seven of ten annotated events had an alert
 onset under the existing event metric. These event counts do not change the
 large number of missed anomalous readings.
@@ -125,7 +126,7 @@ therefore does not imply useful coverage of every recording.
 
 This validation partition has already informed earlier development and selects
 this threshold. Its metrics are not independent held-out performance. No original
-test CSV was opened for this increment. The supervised output predicts SKAB
+test CSV was opened for this experiment. The supervised output predicts SKAB
 anomaly annotations. Neither those annotations nor the sigmoid score establish
 physical failure or a calibrated failure probability.
 

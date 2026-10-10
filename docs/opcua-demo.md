@@ -1,10 +1,10 @@
-# OPC UA acquisition increment
+# OPC UA recording capture
 
 FORGE can replay a permitted SKAB recording through a local OPC UA server,
 capture the measurements with a read-only client, and run the existing detector
-against the verified capture. This demonstrates an acquisition boundary before
-offline investigation. It does not connect to a PLC or a production installation,
-and it does not send a live stream to the LLM.
+against the verified capture. This tests whether the acquisition step preserves
+the measurements used for offline investigation. The server is a local simulator,
+with no connection to a PLC or production installation and no live stream to the LLM.
 
 ## Reproduce the capture
 
@@ -109,4 +109,4 @@ The result establishes transport parity for a simulated replay of one developmen
 recording. It does not improve detector accuracy, establish physical failures,
 or demonstrate plant interoperability. Device authentication, certificates,
 vendor tag mapping, reconnect/recovery policy and a separately evaluated live
-investigation path remain outside this increment.
+investigation path remain outside this prototype.

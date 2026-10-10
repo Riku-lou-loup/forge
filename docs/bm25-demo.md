@@ -1,10 +1,10 @@
 # BM25 retrieval demo
 
-FORGE can now retrieve its analytical notes with either TF-IDF or positive-IDF
-Okapi BM25. TF-IDF remains the default. Both backends return the same `Evidence`
-objects and use the existing citation verification and investigation workflow.
-No model, model pointer, recording, annotation, or corpus passage changes for this
-demo.
+FORGE retrieves analytical notes with either TF-IDF or positive-IDF Okapi BM25.
+TF-IDF remains the default for the investigation service. Both backends return
+the same `Evidence` objects for citation verification and report drafting. The
+demo changes only retrieval, leaving models, model pointers, recordings,
+annotations and corpus passages unchanged.
 
 The corpus contains seven project-authored passages about reviewing recorded pump
 measurements. It is not a collection of manufacturer manuals, and its contents do
@@ -135,7 +135,7 @@ verification does not show that these extra matches are useful. The expected
 IDs identify target passages and are not exhaustive relevance judgments. A larger,
 separately authored relevance set, including difficult queries with incidental
 word overlap, would be needed to judge a change in retrieval quality or choose
-production thresholds. No such evaluation is claimed here.
+production thresholds. That evaluation has not been performed.
 
 ## Behavioral checks
 
