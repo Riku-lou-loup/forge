@@ -10,7 +10,8 @@ $forgeVersions = @(& $forgePython -m pip freeze --all --exclude forge-maintenanc
     --exclude networkx --exclude sympy `
     --exclude aiofiles --exclude aiosqlite --exclude asyncua --exclude cffi `
     --exclude cryptography --exclude pycparser --exclude pyopenssl --exclude pytz `
-    --exclude sortedcontainers)
+    --exclude sortedcontainers `
+    --exclude catboost --exclude graphviz --exclude tabm --exclude rtdl_num_embeddings)
 if ($LASTEXITCODE -ne 0) { throw 'Could not read installed dependency versions.' }
 $forgeHeader = @(
     '# FORGE dependency snapshot: Windows x86-64, Python 3.13.',

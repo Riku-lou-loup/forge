@@ -1,0 +1,8 @@
+# Optional modern-model comparison snapshot: Windows x86-64, Python 3.13.
+# Install requirements-lock.txt and requirements-torch.txt first.
+# Other platforms can use the modern project extra with their own Torch build.
+-c requirements-lock.txt
+catboost==1.2.10
+graphviz==0.21
+tabm==0.0.3
+rtdl_num_embeddings==0.0.12

@@ -74,6 +74,13 @@ False-positive readings changed only from 16,079 to 15,836, and median detected
 event delay increased from 6.5 to 20.5 seconds. The filter remains experimental;
 it does not resolve the detector's high false-positive rate.
 
+A [matched CatBoost and TabM comparison](docs/modern-comparison-results.md) separates
+precision-weighted threshold selection from classifier changes. With F0.5
+selection, HGB reaches 63.8% precision and 63.1% recall, ordered CatBoost 71.5%
+and 64.5%, and compact TabM 83.4% and 56.1%. TabM reduces false-positive readings
+to 954, but produces 216 false alert onsets versus CatBoost's 69. These procedures
+remain experimental and are evaluated on reused development recordings.
+
 [Grouped audit and reproduction](docs/generalization-results.md) · [Development comparison](docs/improvement-results.md) · [Historical baseline](docs/evaluation.md)
 
 ## The data

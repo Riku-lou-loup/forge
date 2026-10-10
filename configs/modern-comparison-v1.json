@@ -1,0 +1,113 @@
+{
+  "protocol": "forge-modern-precision-comparison-v1",
+  "scope": "Retrospective development audit over original train and validation recordings only. Previously inspected data and informed model family choices; not a fresh holdout or a future-time/unseen-machine benchmark.",
+  "seed": 42,
+  "outer_folds": 5,
+  "inner_folds": 3,
+  "splitter": "GroupKFold with shuffle=True, random_state=42; whole overlap groups, not individual readings. Same seed for every inner split.",
+  "reference_readings": 60,
+  "rolling_readings": 20,
+  "max_gap_seconds": 2,
+  "persistence_candidates": [
+    3,
+    5
+  ],
+  "threshold_quantiles": 101,
+  "minimum_point_recall": 0.6,
+  "minimum_event_recall": 0.6,
+  "minimum_group_point_recall": 0.2,
+  "target_precision": 0.95,
+  "target_false_positive_rate": 0.01,
+  "target_false_alarm_onsets_per_normal_hour": 2.0,
+  "infeasible_fallback": "If no point satisfies all recall floors, maximize the minimum capped ratio of achieved recall to each required recall floor, then precision, then minimize false-onset frequency, then recall. Disclose infeasibility. Do not change constraints or discard the outer fold.",
+  "reference_candidate": "current_hgb",
+  "isolation_forest": {
+    "n_estimators": 256,
+    "max_samples": 1024
+  },
+  "threads": 1,
+  "final_refit": "None. Save outer-fold models for reproducibility, no deployment or activation.",
+  "reporting": "All fixed procedures: confusion counts, F0.5, precision, recall, FPR, onsets, sample exposure, availability, missed groups, events and delay. Raw-score AP per group and within each outer fold; do not rank pooled cross-fold probabilities. Test CSVs excluded.",
+  "hypothesis": "Separate the effect of F0.5 alert selection from classifier changes using identical causal relative features and recording groups.",
+  "selection": "HGB historical control retains recall floors and fallback. All other procedures maximize inner OOF F0.5 without recall floors; ties: precision, fewer false onsets per available normal hour, recall, higher threshold. CatBoost depth is selected only inside each outer training pool. No cross-family outer-score winner is activated. Numeric thresholds break ties only within one model; exact metric ties between CatBoost candidates follow the declared order (depth4 first).",
+  "false_positive_exposure": "One second per false-positive sample, consistent with the existing SKAB exposure convention. A proxy, not reconstructed wall-clock alarm duration across gaps.",
+  "candidates": [
+    {
+      "id": "current_hgb",
+      "family": "hgb",
+      "parameters": {
+        "max_iter": 200,
+        "max_leaf_nodes": 7,
+        "min_samples_leaf": 30,
+        "l2_regularization": 10.0,
+        "learning_rate": 0.05,
+        "early_stopping": false
+      }
+    },
+    {
+      "id": "catboost_d4",
+      "family": "catboost",
+      "parameters": {
+        "iterations": 300,
+        "depth": 4,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 10,
+        "boosting_type": "Ordered",
+        "loss_function": "Logloss"
+      }
+    },
+    {
+      "id": "catboost_d6",
+      "family": "catboost",
+      "parameters": {
+        "iterations": 300,
+        "depth": 6,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 10,
+        "boosting_type": "Ordered",
+        "loss_function": "Logloss"
+      }
+    },
+    {
+      "id": "tabm_compact",
+      "family": "tabm",
+      "parameters": {
+        "n_blocks": 2,
+        "d_block": 32,
+        "k": 8,
+        "dropout": 0.1,
+        "epochs": 8,
+        "batch_size": 256,
+        "learning_rate": 0.002,
+        "weight_decay": 0.01
+      }
+    }
+  ],
+  "procedures": {
+    "historical_hgb": {
+      "candidates": [
+        "current_hgb"
+      ],
+      "selection": "historical"
+    },
+    "precision_hgb": {
+      "candidates": [
+        "current_hgb"
+      ],
+      "selection": "f0.5"
+    },
+    "precision_catboost": {
+      "candidates": [
+        "catboost_d4",
+        "catboost_d6"
+      ],
+      "selection": "f0.5"
+    },
+    "precision_tabm": {
+      "candidates": [
+        "tabm_compact"
+      ],
+      "selection": "f0.5"
+    }
+  }
+}
