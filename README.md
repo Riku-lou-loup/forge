@@ -1,13 +1,13 @@
 # FORGE
 
-Investigate pump anomalies from recorded sensor data. FORGE scores a recording,
-retrieves relevant analytical notes, and builds a cited report for human review.
+FORGE detects anomalies in recorded pump sensor data and drafts investigation
+reports with cited analytical notes for human review.
 
 <picture>
   <source media="(prefers-reduced-motion: reduce) and (prefers-color-scheme: dark)" srcset="docs/assets/workflow-static-dark.png">
   <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/workflow-static.png">
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/workflow-dark.gif">
-  <img src="docs/assets/workflow.gif" alt="A sensor interval is selected, matched to analytical notes and assembled into a cited draft awaiting review">
+  <img src="docs/assets/workflow.gif" alt="Sensor readings, anomaly detection and analytical notes feed an investigation draft for human review">
 </picture>
 
 *Workflow illustration. Static versions: [light](docs/assets/workflow-static.png) / [dark](docs/assets/workflow-static-dark.png).*
@@ -16,18 +16,18 @@ retrieves relevant analytical notes, and builds a cited report for human review.
 
 ## The app
 
-Choose a recording, inspect persistent alerts, and read the passages used in the
-investigation. Export the draft as Markdown or JSON, or record a named review first.
+The Streamlit app shows persistent alerts and cited passages for a selected
+recording, with Markdown or JSON export. Reviewed reports include the reviewer's
+name.
 
 ![FORGE running locally with a selected pump recording and alert summary](docs/assets/app.png)
 
-The Streamlit workflow runs on local policy agents and TF-IDF retrieval. Guidance
-is copied from versioned, project-authored notes with citation checks. The separate
-[Qwen CLI](docs/local-llm.md) supports model-selected tools, BM25 retrieval and
-unreviewed LLM drafts through Ollama, either locally or on
-[EnsiCompute](docs/ensicompute.md). Equipment-specific documentation remains future
-work. The [PyTorch and BM25 demo](docs/increment-demo.md) provides an optional
-neural detector and another retrieval option.
+Local policy agents use TF-IDF to retrieve guidance from versioned notes written
+for this project, then check its citations. Equipment-specific documentation has
+yet to be added. The separate [Qwen CLI](docs/local-llm.md) uses model-selected tools
+and BM25 to produce unreviewed LLM drafts through Ollama, locally or on
+[EnsiCompute](docs/ensicompute.md). The [PyTorch and BM25 demo](docs/increment-demo.md)
+includes an optional neural detector and BM25 retrieval.
 
 ## Architecture
 
@@ -42,44 +42,44 @@ flowchart LR
     M -.-> E["Saved evaluation<br/>and grouped audit"]
 ```
 
-Python, scikit-learn, Streamlit, Plotly, LangGraph and Pydantic support the working
-pipeline. Data loading, modeling, retrieval, orchestration and reports have separate
-modules. [Implementation and boundaries](docs/architecture.md).
+Built with Python, scikit-learn, Streamlit, Plotly, LangGraph and Pydantic, FORGE has
+separate modules for data loading, modeling, retrieval, orchestration and reports.
+See the [architecture documentation](docs/architecture.md) for implementation details.
 
-An optional [OPC UA capture prototype](docs/opcua-demo.md) replays a development
-recording through a local simulated server. Its read-only client checks complete
-eight-channel frames, quality and timing before saving an audited capture for
-offline detector comparison. It has not been connected to a PLC or plant network.
+The optional [OPC UA capture prototype](docs/opcua-demo.md) replays a development
+recording through a simulated local server. A read-only client checks eight-channel
+frame completeness, quality and timing, then saves an audited capture for offline
+detector comparison. The prototype has not been connected to a PLC or plant network.
 
 ## What the models show
 
-The active detector uses supervised gradient boosting with changes relative to
-each recording's first 60 readings. Those startup readings are unscored. Isolation
-Forest remains the original baseline.
+The active detector uses supervised gradient boosting on sensor changes relative
+to each recording's first 60 readings, which remain unscored. Isolation Forest is
+the original baseline.
 
 ![Grouped audit results: Isolation Forest 31.0% precision and 83.6% recall; current gradient boosting 32.5% and 91.0%; tuned gradient boosting 33.7% and 89.5%](docs/assets/grouped-audit.png)
 
-The completed audit uses five outer folds across 21 overlap groups, with tuning
-inside three inner folds. Tuning increased precision slightly, but false alert
-episodes rose from 137 to 220. The tuned artifact has not been activated.
+The grouped audit used five outer folds across 21 overlap groups and three inner
+folds for tuning. Precision improved slightly, but false alert episodes rose from
+137 to 220. The tuned model remains inactive.
 
 Earlier model selection reached 95.1% precision and 65.8% recall on one validation
-allocation. The audit shows how sensitive performance is to the recording groups.
-Both analyses use already-inspected development data. New recordings are needed
-for a stronger generalization claim.
+split. The lower audit scores show that performance depends on which recording
+groups are held out. Both analyses reused inspected development data. Assessing
+generalization requires new recordings.
 
-A subsequent [causal score-filter comparison](docs/refinement-results.md) reduced
-false alert onsets from 137 to 41 under the same grouped development protocol.
-False-positive readings changed only from 16,079 to 15,836, and median detected
-event delay increased from 6.5 to 20.5 seconds. The filter remains experimental;
-it does not resolve the detector's high false-positive rate.
+A [causal score filter](docs/refinement-results.md) reduced false alert onsets from
+137 to 41 under the same grouped protocol. False-positive readings fell from 16,079
+to 15,836, while median detected event delay rose from 6.5 to 20.5 seconds. The
+experimental filter reduced alert fragmentation but left a high false-positive rate.
 
-A [matched CatBoost and TabM comparison](docs/modern-comparison-results.md) separates
-precision-weighted threshold selection from classifier changes. With F0.5
-selection, HGB reaches 63.8% precision and 63.1% recall, ordered CatBoost 71.5%
-and 64.5%, and compact TabM 83.4% and 56.1%. TabM reduces false-positive readings
-to 954, but produces 216 false alert onsets versus CatBoost's 69. These procedures
-remain experimental and are evaluated on reused development recordings.
+The [CatBoost and TabM comparison](docs/modern-comparison-results.md) used the same
+folds and features, with a histogram gradient boosting (HGB) control to isolate the
+effect of threshold selection. With the precision-weighted F0.5 objective, HGB
+reached 63.8% precision and 63.1% recall, ordered CatBoost 71.5% and 64.5%, and
+compact TabM 83.4% and 56.1%. TabM reduced false-positive readings to 954 but
+produced 216 false alert onsets, compared with CatBoost's 69. These experimental
+procedures also reused development recordings.
 
 [Grouped audit and reproduction](docs/generalization-results.md) · [Development comparison](docs/improvement-results.md) · [Historical baseline](docs/evaluation.md)
 
@@ -87,15 +87,15 @@ remain experimental and are evaluated on reused development recordings.
 
 ![Flow and pressure from the pinned SKAB development recording, with source anomaly annotations shown in coral](docs/assets/recorded-signals.png)
 
-FORGE uses [SKAB](https://github.com/waico/SKAB), a laboratory pump dataset by
-Iurii D. Katser and Vyacheslav O. Kozitsin. The inventory pins source revisions and
-checksums, and overlapping recordings stay in the same split. Source annotations
-are separate from model inputs. They identify anomalies, not confirmed equipment
-failures. [Provenance, sensors and sampling](data/README.md).
+The recordings come from [SKAB](https://github.com/waico/SKAB), a laboratory pump
+dataset by Iurii D. Katser and Vyacheslav O. Kozitsin. The inventory fixes source
+revisions and checksums, with overlapping recordings kept in the same split.
+Source annotations are excluded from model inputs and identify anomalies, not
+confirmed equipment failures. See [provenance, sensors and sampling](data/README.md).
 
 ## Run locally
 
-Windows and Python 3.13 are the verified setup. In the cloned repository, run:
+Verified on Windows with Python 3.13. Run from the cloned repository:
 
 ```powershell
 python -m venv .venv
@@ -107,16 +107,16 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m forge app
 ```
 
-Open [localhost:8511](http://127.0.0.1:8511). This creates the original baseline.
-Follow the [development comparison](docs/improvement-results.md#reproduce-and-inspect)
-to reproduce and activate the supervised model. No API key or connected equipment is required for this workflow.
+These commands train the original baseline and start the app at
+[localhost:8511](http://127.0.0.1:8511), without an API key or connected equipment.
+The [development comparison](docs/improvement-results.md#reproduce-and-inspect)
+explains how to reproduce and activate the supervised model.
 
 [Setup, CLI export and checks](docs/getting-started.md) · [Analysis notebooks](notebooks/)
 
 ## License
 
-Copyright (c) 2026 Dang Duong Dang Khoa. Original code and documentation use
-[Apache License 2.0](LICENSE), with commercial and noncommercial use permitted
+Copyright (c) 2026 Dang Duong Dang Khoa. Original code and documentation are licensed
+under [Apache License 2.0](LICENSE), permitting commercial and noncommercial use
 under its terms. Preserve the applicable [NOTICE](NOTICE) and
-[attribution](ATTRIBUTION.md). Third-party data and dependencies retain their own
-licenses.
+[attribution](ATTRIBUTION.md). Third-party data and dependencies keep their own licenses.
